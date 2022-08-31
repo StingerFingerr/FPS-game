@@ -15,9 +15,7 @@ public class CharacterControllerScript : MonoBehaviour
     private bool isGrounded;
 
     private float _verticalVelocity;
-
-    public float JumpHeight = 1;
-    public float terminalVerticalVelocity = 3;
+    public float terminalVerticalVelocity = 10;
     
     private void Awake()
     {
@@ -42,37 +40,60 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void Move()
     {
+        if (_move.y < 0)
+            isSprinting = false;
+        
         Vector3 currentMoving = _characterController.velocity;
         currentMoving.y = 0;
         float currentVelocity = currentMoving.magnitude;
-        float targetVelocity;
+        float targetVelocity = CalculateTargetVelocity();
 
-        if (_move == Vector2.zero)
-            targetVelocity = 0f;
-        else
-            targetVelocity = 10f;
 
         currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * _move.magnitude, Time.deltaTime * 10);
-
         Vector3 inputDirection = new Vector3(_move.x, 0, _move.y).normalized;
-
         _characterController.Move(inputDirection * currentVelocity * Time.deltaTime + Vector3.up * _verticalVelocity*Time.deltaTime);
 
     }
 
+    private float CalculateTargetVelocity()
+    {
+        float targetVelocity = 0f;
+
+        if (_move != Vector2.zero)
+        {
+            if (_move.y > 0)
+            {
+                if(isSprinting)
+                    targetVelocity = playerSettings.sprintSpeed;
+                else 
+                    targetVelocity = playerSettings.forwardSpeed;
+
+                if (math.abs(_move.x) > 0)
+                    targetVelocity *= playerSettings.sidewaysSpeedMultiplier;
+            }
+            else if (_move.y < 0)
+                targetVelocity = playerSettings.forwardSpeed * playerSettings.backwardSpeedMultiplier;
+
+            if (math.abs(_move.x) > 0)
+                targetVelocity = playerSettings.forwardSpeed * playerSettings.sidewaysSpeedMultiplier;
+        }
+
+        return targetVelocity;
+    }
+    
     private void CalculateVerticalVelocity()
     {
         if(isGrounded)
             return;
 
         if(math.abs(_verticalVelocity)< terminalVerticalVelocity)
-            _verticalVelocity -= 9.8f * Time.deltaTime;
+            _verticalVelocity -= playerSettings.gravityValue * Time.deltaTime;
     }
     private void Jump()
     {
         if(isGrounded is false)
             return;
         
-        _verticalVelocity = Mathf.Sqrt(JumpHeight * 2f * 9.8f);
+        _verticalVelocity = Mathf.Sqrt(playerSettings.jumpingHeight * 2f * playerSettings.gravityValue);
     }
 }

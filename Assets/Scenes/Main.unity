@@ -809,8 +809,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 554ced8ade7c2914eb7d4a6f3b3074ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerSettings: {fileID: 0}
-  JumpHeight: 1.2
+  playerSettings: {fileID: 11400000, guid: 128a2c7ee63e72c47988e9c79358c8e4, type: 2}
   terminalVerticalVelocity: 10
 --- !u!1 &1760682198
 GameObject:
