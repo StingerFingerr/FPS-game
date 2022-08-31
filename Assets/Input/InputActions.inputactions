@@ -7,7 +7,7 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": "Value",
+                    "type": "PassThrough",
                     "id": "0ea9433d-043f-4907-8659-2da6d3534a70",
                     "expectedControlType": "Vector2",
                     "processors": "",
@@ -68,7 +68,7 @@
                 {
                     "name": "down",
                     "id": "f319d2c4-6b2e-42e4-9b02-57ed95403fe9",
-                    "path": "<Keyboard>/a",
+                    "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -79,7 +79,7 @@
                 {
                     "name": "left",
                     "id": "441dfdb6-9ada-4698-b6f9-7c2cf6ae8e88",
-                    "path": "<Keyboard>/d",
+                    "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -90,7 +90,7 @@
                 {
                     "name": "right",
                     "id": "e0082220-7825-4e72-aea0-f6606c199100",
-                    "path": "<Keyboard>/s",
+                    "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
