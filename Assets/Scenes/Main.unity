@@ -810,8 +810,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerSettings: {fileID: 0}
-  _move: {x: 0, y: 0}
-  isSprinting: 0
+  JumpHeight: 1.2
+  terminalVerticalVelocity: 10
 --- !u!1 &1760682198
 GameObject:
   m_ObjectHideFlags: 0

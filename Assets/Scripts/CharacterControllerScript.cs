@@ -1,4 +1,5 @@
 using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class CharacterControllerScript : MonoBehaviour
@@ -8,10 +9,15 @@ public class CharacterControllerScript : MonoBehaviour
     public PlayerSettings playerSettings;
 
 
-    public Vector2 _move;
+    private Vector2 _move;
     private Vector2 _look;
-    public bool isSprinting;
-    
+    private bool isSprinting;
+    private bool isGrounded;
+
+    private float _verticalVelocity;
+
+    public float JumpHeight = 1;
+    public float terminalVerticalVelocity = 3;
     
     private void Awake()
     {
@@ -28,31 +34,45 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void Update()
     {
+        isGrounded = _characterController.isGrounded;
+        CalculateVerticalVelocity();
         Move();
+        
     }
 
     private void Move()
     {
         Vector3 currentMoving = _characterController.velocity;
         currentMoving.y = 0;
-        float currentSpeed = currentMoving.magnitude;
-        float targetSpeed;
+        float currentVelocity = currentMoving.magnitude;
+        float targetVelocity;
 
         if (_move == Vector2.zero)
-            targetSpeed = 0f;
+            targetVelocity = 0f;
         else
-            targetSpeed = 10f;
+            targetVelocity = 10f;
 
-        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed * _move.magnitude, Time.deltaTime * 10);
+        currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * _move.magnitude, Time.deltaTime * 10);
 
         Vector3 inputDirection = new Vector3(_move.x, 0, _move.y).normalized;
 
-        _characterController.Move(inputDirection * currentSpeed * Time.deltaTime);
+        _characterController.Move(inputDirection * currentVelocity * Time.deltaTime + Vector3.up * _verticalVelocity*Time.deltaTime);
 
     }
-    
+
+    private void CalculateVerticalVelocity()
+    {
+        if(isGrounded)
+            return;
+
+        if(math.abs(_verticalVelocity)< terminalVerticalVelocity)
+            _verticalVelocity -= 9.8f * Time.deltaTime;
+    }
     private void Jump()
     {
+        if(isGrounded is false)
+            return;
         
+        _verticalVelocity = Mathf.Sqrt(JumpHeight * 2f * 9.8f);
     }
 }
