@@ -5,6 +5,16 @@ using UnityEngine;
 [CreateAssetMenu(order = 1, fileName = "PlayerSettings", menuName = "ScriptableObjects/PlayerSettings")]
 public class PlayerSettings : ScriptableObject
 {
+    [Header("Look")]
+    public float mouseSensitivityX;
+    public float mouseSensitivityY;
+    
+    public float bottomClamp;
+    public float topClamp;
+
+    public bool mouseInvertedX;
+    public bool mouseInvertedY;
+    
     [Header("Movement")] public float forwardSpeed;
     public float sprintSpeed;
 
@@ -50,8 +60,7 @@ public class PlayerSettings : ScriptableObject
 
         return normalStance.Height;
     }
-
-    public Vector3 GetStanceCenter(PlayerStance stance)     
+    public Vector3 GetStanceCenter(PlayerStance stance)
     {
         if (stance is PlayerStance.Crouch)
             return crouchStance.Center;
@@ -60,8 +69,7 @@ public class PlayerSettings : ScriptableObject
 
         return normalStance.Center;
     }
-    
-    public Vector3 GetStanceCameraPos(PlayerStance stance)     
+    public Vector3 GetStanceCameraPos(PlayerStance stance)
     {
         if (stance is PlayerStance.Crouch)
             return crouchStance.CameraPos;

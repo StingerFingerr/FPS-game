@@ -33,4 +33,4 @@ MonoBehaviour:
     Height: 1
     Center: {x: 0, y: -0.5, z: 0}
     CameraPos: {x: 0, y: 0, z: 0}
-  stanceTransitionSmooth: 10
+  stanceTransitionSmooth: 8

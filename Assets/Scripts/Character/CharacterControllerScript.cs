@@ -10,15 +10,17 @@ public class CharacterControllerScript : MonoBehaviour
     public PlayerSettings playerSettings;
 
     private PlayerSettings.PlayerStance _currentStance = PlayerSettings.PlayerStance.Normal;
-    
+
     private Vector2 _move;
     private Vector2 _look;
+    private float verticalRotation;
+    private float horizontalRotation;
     private bool _isSprinting;
     private bool _isGrounded;
 
     private float _verticalVelocity;
     public float terminalVerticalVelocity = 10;
-    
+
     private void Awake()
     {
         _input = new InputActions();
@@ -42,6 +44,25 @@ public class CharacterControllerScript : MonoBehaviour
         CalculateStance();
     }
 
+    private void LateUpdate()
+    {
+        Look();
+    }
+
+    private void Look()
+    {
+        horizontalRotation = _look.x * playerSettings.mouseSensitivityX * Time.deltaTime*
+                             (playerSettings.mouseInvertedX ? 1 : -1);
+        verticalRotation += _look.y * playerSettings.mouseSensitivityY * Time.deltaTime*
+                            (playerSettings.mouseInvertedY ? 1 : -1);
+
+        verticalRotation = Mathf.Clamp(verticalRotation, playerSettings.bottomClamp, playerSettings.topClamp);
+        
+        fpsCameraTransform.localRotation = Quaternion.Euler(verticalRotation,0,0);
+        transform.Rotate(Vector3.up, horizontalRotation);
+
+    }
+
     private void Move()
     {
         if (_move.y < 0)
@@ -55,8 +76,8 @@ public class CharacterControllerScript : MonoBehaviour
 
         currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * _move.magnitude, Time.deltaTime * 10);
         Vector3 inputDirection = new Vector3(_move.x, 0, _move.y).normalized;
-        _characterController.Move(inputDirection * currentVelocity * Time.deltaTime + Vector3.up * _verticalVelocity*Time.deltaTime);
-
+        Vector3 newDirection = transform.TransformDirection(inputDirection);
+        _characterController.Move(newDirection * currentVelocity * Time.deltaTime + Vector3.up * _verticalVelocity*Time.deltaTime);
     }
 
     private float CalculateTargetVelocity()
