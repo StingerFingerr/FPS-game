@@ -12,11 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 724e07605592bea49b7bbef3c961473d, type: 3}
   m_Name: PlayerSettings
   m_EditorClassIdentifier: 
+  mouseSensitivityX: 10
+  mouseSensitivityY: 10
+  bottomClamp: -80
+  topClamp: 80
+  mouseInvertedX: 1
+  mouseInvertedY: 0
   forwardSpeed: 6
-  sprintSpeed: 9
+  sprintSpeed: 11
   backwardSpeedMultiplier: 0.6
   fallingSpeedMultiplier: 0.7
-  sidewaysSpeedMultiplier: 0.8
+  sidewaysSpeedMultiplier: 0.9
   crouchSpeedMultiplier: 0
   proneSpeedMultiplier: 0
   jumpingHeight: 2
