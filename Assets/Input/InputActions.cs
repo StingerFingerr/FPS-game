@@ -175,7 +175,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""c6ca80eb-dc11-4c28-b7ed-c937aa42e02d"",
                     ""path"": ""<Keyboard>/c"",
-                    ""interactions"": ""Tap"",
+                    ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Crouch"",
