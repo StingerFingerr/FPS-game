@@ -17,5 +17,20 @@ MonoBehaviour:
   backwardSpeedMultiplier: 0.6
   fallingSpeedMultiplier: 0.7
   sidewaysSpeedMultiplier: 0.8
+  crouchSpeedMultiplier: 0
+  proneSpeedMultiplier: 0
   jumpingHeight: 2
   gravityValue: 20
+  normalStance:
+    Height: 2
+    Center: {x: 0, y: 0, z: 0}
+    CameraPos: {x: 0, y: 1, z: 0}
+  crouchStance:
+    Height: 1.5
+    Center: {x: 0, y: -0.25, z: 0}
+    CameraPos: {x: 0, y: 0.5, z: 0}
+  proneStance:
+    Height: 1
+    Center: {x: 0, y: -0.5, z: 0}
+    CameraPos: {x: 0, y: 0, z: 0}
+  stanceTransitionSmooth: 10
