@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour
@@ -40,6 +41,9 @@ public class Weapon : MonoBehaviour
             Quaternion.AngleAxis(_playerLook.x * settings.swayIntensityX * (settings.swayInvertedX ? -1 : 1), Vector3.up);
         Quaternion rotationY =
             Quaternion.AngleAxis(_playerLook.y * settings.swayIntensityY * (settings.swayInvertedY ? -1 : 1), Vector3.right);
+       
+        rotationX.y = Math.Clamp(rotationX.y, -settings.swayClampX, settings.swayClampX);
+        rotationY.x = Math.Clamp(rotationY.x, -settings.swayClampY, settings.swayClampY);
         
         Quaternion targetRotation = _originRotation * rotationX * rotationY;
         

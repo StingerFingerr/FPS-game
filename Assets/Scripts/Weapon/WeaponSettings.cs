@@ -12,6 +12,8 @@ public class WeaponSettings : ScriptableObject
     public float swayIntensityY;
     public bool swayInvertedX;
     public bool swayInvertedY;
+    public float swayClampX;
+    public float swayClampY;
     public float swaySmooth;
     
 }
