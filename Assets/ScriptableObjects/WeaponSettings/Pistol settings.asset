@@ -18,4 +18,6 @@ MonoBehaviour:
   swayIntensityY: 0.5
   swayInvertedX: 1
   swayInvertedY: 0
+  swayClampX: 0.15
+  swayClampY: 0.15
   swaySmooth: 10
