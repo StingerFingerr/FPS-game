@@ -215,6 +215,6 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawSphere(fpsCameraTransform.position, checkSphereRadius);
+        //Gizmos.DrawSphere(fpsCameraTransform.position, checkSphereRadius);
     }
 }
