@@ -21,6 +21,9 @@ public class CharacterControllerScript : MonoBehaviour
     private float _verticalVelocity;
     public float terminalVerticalVelocity = 10;
 
+    public LayerMask ObstaclesLayerMask;
+    public float checkSphereRadius;
+    
     private void Awake()
     {
         _input = new InputActions();
@@ -51,23 +54,22 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void Look()
     {
-        horizontalRotation = _look.x * playerSettings.mouseSensitivityX * Time.deltaTime*
+        horizontalRotation = _look.x * playerSettings.mouseSensitivityX * Time.deltaTime *
                              (playerSettings.mouseInvertedX ? 1 : -1);
-        verticalRotation += _look.y * playerSettings.mouseSensitivityY * Time.deltaTime*
+        verticalRotation += _look.y * playerSettings.mouseSensitivityY * Time.deltaTime *
                             (playerSettings.mouseInvertedY ? 1 : -1);
 
         verticalRotation = Mathf.Clamp(verticalRotation, playerSettings.bottomClamp, playerSettings.topClamp);
-        
-        fpsCameraTransform.localRotation = Quaternion.Euler(verticalRotation,0,0);
+
+        fpsCameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0, 0);
         transform.Rotate(Vector3.up, horizontalRotation);
 
     }
 
     private void Move()
     {
-        if (_move.y < 0)
-            _isSprinting = false;
-        
+        CheckSprinting();
+
         Vector3 currentMoving = _characterController.velocity;
         currentMoving.y = 0;
         float currentVelocity = currentMoving.magnitude;
@@ -77,7 +79,16 @@ public class CharacterControllerScript : MonoBehaviour
         currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * _move.magnitude, Time.deltaTime * 10);
         Vector3 inputDirection = new Vector3(_move.x, 0, _move.y).normalized;
         Vector3 newDirection = transform.TransformDirection(inputDirection);
-        _characterController.Move(newDirection * currentVelocity * Time.deltaTime + Vector3.up * _verticalVelocity*Time.deltaTime);
+        _characterController.Move(newDirection * currentVelocity * Time.deltaTime +
+                                  Vector3.up * _verticalVelocity * Time.deltaTime);
+    }
+
+    private void CheckSprinting()
+    {
+        if (_move.y < 0)
+            _isSprinting = false;
+        if (_currentStance is PlayerSettings.PlayerStance.Prone)
+            _isSprinting = false;
     }
 
     private float CalculateTargetVelocity()
@@ -86,6 +97,9 @@ public class CharacterControllerScript : MonoBehaviour
 
         if (_move != Vector2.zero)
         {
+            if (math.abs(_move.x) > 0)
+                targetVelocity = playerSettings.forwardSpeed * playerSettings.sidewaysSpeedMultiplier;
+            
             if (_move.y > 0)
             {
                 if(_isSprinting)
@@ -99,8 +113,11 @@ public class CharacterControllerScript : MonoBehaviour
             else if (_move.y < 0)
                 targetVelocity = playerSettings.forwardSpeed * playerSettings.backwardSpeedMultiplier;
 
-            if (math.abs(_move.x) > 0)
-                targetVelocity = playerSettings.forwardSpeed * playerSettings.sidewaysSpeedMultiplier;
+
+            if (_currentStance is PlayerSettings.PlayerStance.Crouch)
+                targetVelocity *= playerSettings.crouchSpeedMultiplier;
+            if (_currentStance is PlayerSettings.PlayerStance.Prone)
+                targetVelocity *= playerSettings.proneSpeedMultiplier;
         }
 
         return targetVelocity;
@@ -140,6 +157,9 @@ public class CharacterControllerScript : MonoBehaviour
     
     private void Jump()
     {
+        if(CheckObstaclesOverhead())
+            return;
+        
         if(_currentStance is PlayerSettings.PlayerStance.Prone)
             return;
         if (_currentStance is PlayerSettings.PlayerStance.Crouch)
@@ -153,11 +173,25 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void ToggleCrouch()
     {
-        if (_currentStance is PlayerSettings.PlayerStance.Normal ||
-            _currentStance is PlayerSettings.PlayerStance.Prone)
-            _currentStance = PlayerSettings.PlayerStance.Crouch;
-        else
+        if (_currentStance is PlayerSettings.PlayerStance.Crouch)
+        {
+            if (CheckObstaclesOverhead())
+                return;
+
             _currentStance = PlayerSettings.PlayerStance.Normal;
+            return;
+        }
+
+        if (_currentStance is PlayerSettings.PlayerStance.Prone)
+        {
+            if (CheckObstaclesOverhead())
+                return;
+            
+            _currentStance = PlayerSettings.PlayerStance.Crouch;
+            return;
+        }
+        
+        _currentStance = PlayerSettings.PlayerStance.Crouch;
     }
 
     private void ToggleProne()
@@ -166,6 +200,21 @@ public class CharacterControllerScript : MonoBehaviour
             _currentStance is PlayerSettings.PlayerStance.Crouch)
             _currentStance = PlayerSettings.PlayerStance.Prone;
         else
+        {
+            if(CheckObstaclesOverhead())
+                return;
+            
             _currentStance = PlayerSettings.PlayerStance.Crouch;
+        }
+    }
+
+    private bool CheckObstaclesOverhead()
+    {
+        return Physics.CheckSphere(fpsCameraTransform.position, checkSphereRadius, ObstaclesLayerMask, QueryTriggerInteraction.Ignore);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(fpsCameraTransform.position, checkSphereRadius);
     }
 }
