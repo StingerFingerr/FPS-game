@@ -183,6 +183,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Weapon",
+            "id": "ff52747d-fe1d-4bd8-9e48-5c168677e9ab",
+            "actions": [
+                {
+                    "name": "Aim",
+                    "type": "Button",
+                    "id": "11aad2a5-f04c-4350-9f98-665366cc7462",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8869f6ad-4fd3-4ad8-af5f-f240bba36279",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
