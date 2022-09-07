@@ -6,14 +6,22 @@ using UnityEngine;
 public class WeaponSettings : ScriptableObject
 {
     public string name;
-    public float aimingTime;
+    public float aimingTime = 10;
 
-    public float swayIntensityX;
-    public float swayIntensityY;
-    public bool swayInvertedX;
+    [Header("Sway")]
+    public float swayIntensityX = .5f;
+    public float swayIntensityY = .5f;
+    public bool swayInvertedX = true;
     public bool swayInvertedY;
-    public float swayClampX;
-    public float swayClampY;
-    public float swaySmooth;
-    
+    public float swayClampX = .15f;
+    public float swayClampY = .15f;
+    public float swaySmooth = 10f;
+
+    [Header("Movement Sway")] 
+    public float movementSwayIntensity = 10f;
+    public float movementSwayClampX = 20f;
+    public float movementSwayClampY = 20f;
+    public float movementSwaySmooth = 3f;
+
+
 }
