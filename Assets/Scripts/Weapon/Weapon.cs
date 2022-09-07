@@ -22,11 +22,20 @@ public class Weapon : MonoBehaviour
         _input.Player.Move.performed += e => _playerMove = e.ReadValue<Vector2>();
         _input.Weapon.Aim.performed += e => _isAiming = true;
         _input.Weapon.Aim.canceled += e => _isAiming = false;
-        _input.Enable();
 
         Cursor.visible = false;
 
         _originRotation = transform.localRotation;
+    }
+
+    private void OnEnable()
+    {
+        _input.Enable();
+    }
+
+    private void OnDisable()
+    {
+        _input.Disable();
     }
 
     private void Update()
@@ -64,7 +73,7 @@ public class Weapon : MonoBehaviour
 
         Quaternion targetRotation = _originRotation * rotationX * rotationZ;
 
-        transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation,
+        transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation,
             Time.deltaTime * settings.movementSwaySmooth);
         
     }
