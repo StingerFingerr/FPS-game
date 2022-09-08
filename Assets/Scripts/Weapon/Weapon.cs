@@ -1,5 +1,4 @@
 using System;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -15,7 +14,7 @@ public class Weapon : MonoBehaviour
     public Vector3 hipPosition;
     public Vector3 aimPosition;
 
-    private bool _isAiming;
+    public bool isAiming { get; private set; }
     private Quaternion _originRotation;
 
     private bool _isSprinting;
@@ -28,7 +27,7 @@ public class Weapon : MonoBehaviour
         _input = new InputActions();
         _input.Player.Look.performed += e => _playerLook = e.ReadValue<Vector2>();
         _input.Player.Move.performed += e => _playerMove = e.ReadValue<Vector2>();
-        _input.Player.Sprint.performed += e => _isSprinting = !_isAiming;
+        _input.Player.Sprint.performed += e => _isSprinting = !isAiming;
         _input.Player.Sprint.canceled += e => _isSprinting = false;
         _input.Weapon.Aim.performed += e => StartAiming();
         _input.Weapon.Aim.canceled += e => FinishAiming();
@@ -91,7 +90,7 @@ public class Weapon : MonoBehaviour
 
     private void CalculateAiming()
     {
-        if (_isAiming)
+        if (isAiming)
             transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition, Time.deltaTime * settings.aimingTime);
         else
             transform.localPosition = Vector3.Lerp(transform.localPosition, hipPosition, Time.deltaTime * settings.aimingTime);
@@ -99,9 +98,8 @@ public class Weapon : MonoBehaviour
 
     private void SetAnimations()
     {
-        if (_isAiming)
+        if (isAiming)
         {
-            //_animator.speed = Mathf.Lerp(_animator.speed, 0, Time.deltaTime *10f);
             _animator.speed = 0;
             if(_animator.speed < .05f)
                 _animator.enabled = false;  
@@ -116,7 +114,6 @@ public class Weapon : MonoBehaviour
         _animator.enabled = true;
         _animator.SetBool("isSprinting", _isSprinting);
         _animator.speed = Mathf.Lerp(_animator.speed, _characterVelocity, Time.deltaTime *10f);
-
     }
 
     private void StartAiming()
@@ -124,14 +121,14 @@ public class Weapon : MonoBehaviour
         if(_isSprinting)
             return;
           
-        _isAiming = true;
-        onPlayerAiming.Invoke(_isAiming);
+        isAiming = true;
+        onPlayerAiming.Invoke(isAiming);
     }
 
     private void FinishAiming()
     {
-        _isAiming = false;
-        onPlayerAiming.Invoke(_isAiming);
+        isAiming = false;
+        onPlayerAiming.Invoke(isAiming);
     }
     public void SetCharacterVelocity(float normVelocity)
     {

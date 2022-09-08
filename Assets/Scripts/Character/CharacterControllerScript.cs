@@ -17,7 +17,6 @@ public class CharacterControllerScript : MonoBehaviour
     private float _horizontalRotation;
     private bool _isSprinting;
     private bool _isGrounded;
-    private bool _isAiming;
 
     private float _verticalVelocity;
     public float terminalVerticalVelocity = 10;
@@ -109,7 +108,7 @@ public class CharacterControllerScript : MonoBehaviour
             _isSprinting = false;
         if (_currentStance is PlayerSettings.PlayerStance.Prone)
             _isSprinting = false;
-        if (_isAiming)
+        if (currentWeapon.isAiming)
             _isSprinting = false;
     }
 
@@ -232,8 +231,6 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void ToggleSprinting(bool isAiming)
     {
-        _isAiming = isAiming;
-        
         if (isAiming)
             _isSprinting = false;
     }
