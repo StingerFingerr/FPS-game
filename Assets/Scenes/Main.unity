@@ -24,7 +24,7 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 4
+  m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
@@ -1103,11 +1103,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 521716803}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.164, z: 0.2}
+  m_LocalPosition: {x: 0.2, y: -0.2, z: 0.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1977208904}
+  - {fileID: 684211220}
   m_Father: {fileID: 1096820928}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1123,6 +1123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e6e475c5528fd8448ff6a604afcce62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _animator: {fileID: 684211221}
   settings: {fileID: 11400000, guid: 0d557c7b85fd37f41b28b28b442f6323, type: 2}
   hipPosition: {x: 0.2, y: -0.2, z: 0.3}
   aimPosition: {x: 0, y: -0.164, z: 0.2}
@@ -1354,6 +1355,59 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 07b9db8a4c5b12449b9ee8e9fbccd558, type: 3}
+--- !u!1 &684211219
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 684211220}
+  - component: {fileID: 684211221}
+  m_Layer: 7
+  m_Name: Animations
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &684211220
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684211219}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1977208904}
+  m_Father: {fileID: 521716804}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &684211221
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684211219}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5916cfb8d88c6eb4098494004e46f021, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &762261520
 GameObject:
   m_ObjectHideFlags: 0
@@ -1525,10 +1579,11 @@ MonoBehaviour:
   fpsCameraTransform: {fileID: 390431100}
   playerSettings: {fileID: 11400000, guid: 128a2c7ee63e72c47988e9c79358c8e4, type: 2}
   terminalVerticalVelocity: 10
-  ObstaclesLayerMask:
+  obstaclesLayerMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 0
   checkSphereRadius: 0.4
+  currentWeapon: {fileID: 521716805}
 --- !u!1 &1096820927
 GameObject:
   m_ObjectHideFlags: 0
@@ -2352,7 +2407,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 521716804}
+    m_TransformParent: {fileID: 684211220}
     m_Modifications:
     - target: {fileID: 2028706313821389389, guid: fea1566d87ea59143812144b7c80b26a,
         type: 3}
@@ -2412,7 +2467,7 @@ PrefabInstance:
     - target: {fileID: 5879184804230780161, guid: fea1566d87ea59143812144b7c80b26a,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5879184804230780161, guid: fea1566d87ea59143812144b7c80b26a,
         type: 3}
