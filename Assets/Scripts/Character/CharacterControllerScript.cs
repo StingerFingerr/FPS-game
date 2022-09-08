@@ -13,16 +13,18 @@ public class CharacterControllerScript : MonoBehaviour
 
     private Vector2 _move;
     private Vector2 _look;
-    private float verticalRotation;
-    private float horizontalRotation;
+    private float _verticalRotation;
+    private float _horizontalRotation;
     private bool _isSprinting;
     private bool _isGrounded;
 
     private float _verticalVelocity;
     public float terminalVerticalVelocity = 10;
 
-    public LayerMask ObstaclesLayerMask;
+    public LayerMask obstaclesLayerMask;
     public float checkSphereRadius;
+
+    public Weapon currentWeapon;
     
     private void Awake()
     {
@@ -34,9 +36,22 @@ public class CharacterControllerScript : MonoBehaviour
         _input.Player.Jump.performed += e => Jump();
         _input.Player.Crouch.performed += e => ToggleCrouch();
         _input.Player.Prone.performed += e => ToggleProne();
-        _input.Enable();
-
+        
         _characterController = GetComponent<CharacterController>();
+    }
+
+    private void Start()
+    {
+        Weapon.onPlayerAiming.AddListener(ToggleSprinting);
+    }
+
+    private void OnEnable()
+    {
+        _input.Enable();
+    }
+    private void OnDisable()
+    {
+        _input.Disable();
     }
 
     private void Update()
@@ -54,15 +69,15 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void Look()
     {
-        horizontalRotation = _look.x * playerSettings.mouseSensitivityX * Time.deltaTime *
+        _horizontalRotation = _look.x * playerSettings.mouseSensitivityX * Time.deltaTime *
                              (playerSettings.mouseInvertedX ? 1 : -1);
-        verticalRotation += _look.y * playerSettings.mouseSensitivityY * Time.deltaTime *
+        _verticalRotation += _look.y * playerSettings.mouseSensitivityY * Time.deltaTime *
                             (playerSettings.mouseInvertedY ? 1 : -1);
 
-        verticalRotation = Mathf.Clamp(verticalRotation, playerSettings.bottomClamp, playerSettings.topClamp);
+        _verticalRotation = Mathf.Clamp(_verticalRotation, playerSettings.bottomClamp, playerSettings.topClamp);
 
-        fpsCameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0, 0);
-        transform.Rotate(Vector3.up, horizontalRotation);
+        fpsCameraTransform.localRotation = Quaternion.Euler(_verticalRotation, 0, 0);
+        transform.Rotate(Vector3.up, _horizontalRotation);
 
     }
 
@@ -75,12 +90,18 @@ public class CharacterControllerScript : MonoBehaviour
         float currentVelocity = currentMoving.magnitude;
         float targetVelocity = CalculateTargetVelocity();
 
-
-        currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * _move.magnitude, Time.deltaTime * 10);
+        
+        
+        currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * _move.magnitude, Time.deltaTime * 10f);
         Vector3 inputDirection = new Vector3(_move.x, 0, _move.y).normalized;
         Vector3 newDirection = transform.TransformDirection(inputDirection);
         _characterController.Move(newDirection * currentVelocity * Time.deltaTime +
                                   Vector3.up * _verticalVelocity * Time.deltaTime);
+
+        Vector3 newHorizontalVelocity = _characterController.velocity;
+        newHorizontalVelocity.y = 0;
+        
+        currentWeapon.SetCharacterVelocity(newHorizontalVelocity.magnitude / (targetVelocity + .01f));
     }
 
     private void CheckSprinting()
@@ -208,9 +229,15 @@ public class CharacterControllerScript : MonoBehaviour
         }
     }
 
+    private void ToggleSprinting(bool isAiming)
+    {
+        if (isAiming)
+            _isSprinting = false;
+    }
+
     private bool CheckObstaclesOverhead()
     {
-        return Physics.CheckSphere(fpsCameraTransform.position, checkSphereRadius, ObstaclesLayerMask, QueryTriggerInteraction.Ignore);
+        return Physics.CheckSphere(fpsCameraTransform.position, checkSphereRadius, obstaclesLayerMask, QueryTriggerInteraction.Ignore);
     }
 
     private void OnDrawGizmos()
