@@ -28,7 +28,7 @@ public class Weapon : MonoBehaviour
         _input = new InputActions();
         _input.Player.Look.performed += e => _playerLook = e.ReadValue<Vector2>();
         _input.Player.Move.performed += e => _playerMove = e.ReadValue<Vector2>();
-        _input.Player.Sprint.performed += e => _isSprinting = true;
+        _input.Player.Sprint.performed += e => _isSprinting = !_isAiming;
         _input.Player.Sprint.canceled += e => _isSprinting = false;
         _input.Weapon.Aim.performed += e => StartAiming();
         _input.Weapon.Aim.canceled += e => FinishAiming();

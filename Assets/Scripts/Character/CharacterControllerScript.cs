@@ -17,6 +17,7 @@ public class CharacterControllerScript : MonoBehaviour
     private float _horizontalRotation;
     private bool _isSprinting;
     private bool _isGrounded;
+    private bool _isAiming;
 
     private float _verticalVelocity;
     public float terminalVerticalVelocity = 10;
@@ -90,8 +91,6 @@ public class CharacterControllerScript : MonoBehaviour
         float currentVelocity = currentMoving.magnitude;
         float targetVelocity = CalculateTargetVelocity();
 
-        
-        
         currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * _move.magnitude, Time.deltaTime * 10f);
         Vector3 inputDirection = new Vector3(_move.x, 0, _move.y).normalized;
         Vector3 newDirection = transform.TransformDirection(inputDirection);
@@ -109,6 +108,8 @@ public class CharacterControllerScript : MonoBehaviour
         if (_move.y < 0)
             _isSprinting = false;
         if (_currentStance is PlayerSettings.PlayerStance.Prone)
+            _isSprinting = false;
+        if (_isAiming)
             _isSprinting = false;
     }
 
@@ -231,6 +232,8 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void ToggleSprinting(bool isAiming)
     {
+        _isAiming = isAiming;
+        
         if (isAiming)
             _isSprinting = false;
     }
