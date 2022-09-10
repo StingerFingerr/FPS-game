@@ -6,7 +6,7 @@ public class Weapon : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
 
-    public static UnityEvent<bool> onPlayerAiming = new UnityEvent<bool>();
+    public static UnityEvent<bool> onPlayerAiming = new();
     
     private InputActions _input;
     public WeaponSettings settings;
@@ -18,6 +18,9 @@ public class Weapon : MonoBehaviour
     private Quaternion _originRotation;
 
     private bool _isSprinting;
+    private bool _isJumping;
+    private bool _isFalling;
+    
     private Vector2 _playerLook;
     private Vector2 _playerMove;
     private float _characterVelocity;
@@ -35,6 +38,13 @@ public class Weapon : MonoBehaviour
         Cursor.visible = false;
 
         _originRotation = transform.localRotation;
+    }
+
+    private void Start()
+    {
+        CharacterControllerScript.onPlayerJump.AddListener(SetJumpingAnimation);
+        CharacterControllerScript.onPlayerLands.AddListener(SetLandingAnimation);
+        CharacterControllerScript.onPlayerFalling.AddListener(SetFallingAnimation);
     }
 
     private void OnEnable()
@@ -98,6 +108,9 @@ public class Weapon : MonoBehaviour
 
     private void SetAnimations()
     {
+        if (_isJumping)
+            return;
+
         if (isAiming)
         {
             _animator.speed = 0;
@@ -112,13 +125,52 @@ public class Weapon : MonoBehaviour
         }
         
         _animator.enabled = true;
+        
+        if (_playerMove == Vector2.zero)
+        {
+            _animator.speed = 1;
+            _animator.SetBool("isIdle", true);
+            return;
+        }
+
+        _animator.SetBool("isIdle", false);
         _animator.SetBool("isSprinting", _isSprinting);
-        _animator.speed = Mathf.Lerp(_animator.speed, _characterVelocity, Time.deltaTime *10f);
+        _animator.speed = Mathf.Lerp(_animator.speed, _characterVelocity, Time.deltaTime * 10f);
+    }
+
+    private void SetJumpingAnimation()
+    {
+        _isJumping = true;
+
+        _animator.speed = 1;
+        _animator.SetTrigger("isJumping");
+    }
+
+    private void SetFallingAnimation()
+    {
+        if(_isFalling)
+            return;
+
+        _isFalling = true;
+
+        _animator.speed = 1;
+        _animator.SetTrigger("isFalling");
+    }
+    
+    private void SetLandingAnimation()
+    {
+        _isJumping = false;
+        _isFalling = false;
+        _animator.speed = 1;
+
+        _animator.SetTrigger("isLanding");
     }
 
     private void StartAiming()
     {
         if(_isSprinting)
+            return;
+        if(_isFalling)
             return;
           
         isAiming = true;
@@ -130,9 +182,14 @@ public class Weapon : MonoBehaviour
         isAiming = false;
         onPlayerAiming.Invoke(isAiming);
     }
+    
     public void SetCharacterVelocity(float normVelocity)
     {
         _characterVelocity = normVelocity;
     }
+
+    
+        
+    
 
 }

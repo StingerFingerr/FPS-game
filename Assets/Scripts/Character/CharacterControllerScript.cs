@@ -1,9 +1,14 @@
 using System;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class CharacterControllerScript : MonoBehaviour
 {
+    public static UnityEvent onPlayerJump = new();
+    public static UnityEvent onPlayerLands = new();
+    public static UnityEvent onPlayerFalling = new();
+    
     private CharacterController _characterController;
     public Transform fpsCameraTransform;
     private InputActions _input;
@@ -56,7 +61,7 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void Update()
     {
-        _isGrounded = _characterController.isGrounded;
+        CheckGround();
         CalculateVerticalVelocity();
         Move();
         CalculateStance();
@@ -102,6 +107,21 @@ public class CharacterControllerScript : MonoBehaviour
         currentWeapon.SetCharacterVelocity(newHorizontalVelocity.magnitude / (targetVelocity + .01f));
     }
 
+    private void CheckGround()
+    {
+        bool newGrounded = _characterController.isGrounded;
+        
+        if(_verticalVelocity < 0 && newGrounded is false)
+            onPlayerFalling.Invoke();
+        
+        //if(_isGrounded && newGrounded is false)
+        //    onPlayerFalling.Invoke();
+        
+        if(_isGrounded is false && newGrounded)
+            onPlayerLands.Invoke();
+        
+        _isGrounded = newGrounded;
+    }
     private void CheckSprinting()
     {
         if (_move.y < 0)
@@ -190,6 +210,8 @@ public class CharacterControllerScript : MonoBehaviour
             return;
         
         _verticalVelocity = Mathf.Sqrt(playerSettings.jumpingHeight * 2f * playerSettings.gravityValue);
+        
+        onPlayerJump.Invoke();
     }
 
     private void ToggleCrouch()
