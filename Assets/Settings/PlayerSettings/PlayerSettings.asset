@@ -14,17 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseSensitivityX: 10
   mouseSensitivityY: 10
+  aimingMouseSensitivityModifier: 0.5
   bottomClamp: -80
   topClamp: 80
   mouseInvertedX: 1
   mouseInvertedY: 0
   forwardSpeed: 6
   sprintSpeed: 11
-  backwardSpeedMultiplier: 0.6
-  fallingSpeedMultiplier: 0.7
-  sidewaysSpeedMultiplier: 0.9
-  crouchSpeedMultiplier: 0.7
-  proneSpeedMultiplier: 0.3
+  backwardSpeedModifier: 0.6
+  fallingSpeedModifier: 0.7
+  sidewaysSpeedModifier: 0.9
+  crouchSpeedModifier: 0.7
+  proneSpeedModifier: 0.3
+  aimingSpeedModifier: 0.7
   jumpingHeight: 2
   gravityValue: 20
   normalStance:

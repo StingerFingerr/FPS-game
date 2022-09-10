@@ -8,6 +8,7 @@ public class PlayerSettings : ScriptableObject
     [Header("Look")]
     public float mouseSensitivityX;
     public float mouseSensitivityY;
+    public float aimingMouseSensitivityModifier;
     
     public float bottomClamp;
     public float topClamp;
@@ -15,15 +16,18 @@ public class PlayerSettings : ScriptableObject
     public bool mouseInvertedX;
     public bool mouseInvertedY;
     
-    [Header("Movement")] public float forwardSpeed;
+    [Header("Movement")] 
+    public float forwardSpeed;
     public float sprintSpeed;
 
-    public float backwardSpeedMultiplier;
-    public float fallingSpeedMultiplier;
-    public float sidewaysSpeedMultiplier;
+    public float backwardSpeedModifier;
+    public float fallingSpeedModifier;
+    public float sidewaysSpeedModifier;
 
-    public float crouchSpeedMultiplier;
-    public float proneSpeedMultiplier;
+    public float crouchSpeedModifier;
+    public float proneSpeedModifier;
+
+    public float aimingSpeedModifier;
 
     [Header("Jumping")] public float jumpingHeight;
     public float gravityValue;

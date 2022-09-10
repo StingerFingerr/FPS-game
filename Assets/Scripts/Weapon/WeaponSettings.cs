@@ -11,6 +11,7 @@ public class WeaponSettings : ScriptableObject
     [Header("Sway")]
     public float swayIntensityX = .5f;
     public float swayIntensityY = .5f;
+    public float aimingSwayIntensityModifier = .5f;
     public bool swayInvertedX = true;
     public bool swayInvertedY;
     public float swayClampX = .15f;

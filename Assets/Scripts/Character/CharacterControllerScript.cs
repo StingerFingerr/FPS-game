@@ -45,11 +45,6 @@ public class CharacterControllerScript : MonoBehaviour
         _characterController = GetComponent<CharacterController>();
     }
 
-    private void Start()
-    {
-        Weapon.onPlayerAiming.AddListener(ToggleSprinting);
-    }
-
     private void OnEnable()
     {
         _input.Enable();
@@ -74,9 +69,18 @@ public class CharacterControllerScript : MonoBehaviour
 
     private void Look()
     {
-        _horizontalRotation = _look.x * playerSettings.mouseSensitivityX * Time.deltaTime *
+        float sensX = playerSettings.mouseSensitivityX;
+        float sensY = playerSettings.mouseSensitivityY;
+
+        if (currentWeapon.isAiming)
+        {
+            sensX *= playerSettings.aimingMouseSensitivityModifier;
+            sensY *= playerSettings.aimingMouseSensitivityModifier;
+        }
+        
+        _horizontalRotation = _look.x * sensX * Time.deltaTime *
                              (playerSettings.mouseInvertedX ? 1 : -1);
-        _verticalRotation += _look.y * playerSettings.mouseSensitivityY * Time.deltaTime *
+        _verticalRotation += _look.y * sensY * Time.deltaTime *
                             (playerSettings.mouseInvertedY ? 1 : -1);
 
         _verticalRotation = Mathf.Clamp(_verticalRotation, playerSettings.bottomClamp, playerSettings.topClamp);
@@ -113,10 +117,7 @@ public class CharacterControllerScript : MonoBehaviour
         
         if(_verticalVelocity < 0 && newGrounded is false)
             onPlayerFalling.Invoke();
-        
-        //if(_isGrounded && newGrounded is false)
-        //    onPlayerFalling.Invoke();
-        
+
         if(_isGrounded is false && newGrounded)
             onPlayerLands.Invoke();
         
@@ -139,7 +140,7 @@ public class CharacterControllerScript : MonoBehaviour
         if (_move != Vector2.zero)
         {
             if (math.abs(_move.x) > 0)
-                targetVelocity = playerSettings.forwardSpeed * playerSettings.sidewaysSpeedMultiplier;
+                targetVelocity = playerSettings.forwardSpeed * playerSettings.sidewaysSpeedModifier;
             
             if (_move.y > 0)
             {
@@ -149,18 +150,26 @@ public class CharacterControllerScript : MonoBehaviour
                     targetVelocity = playerSettings.forwardSpeed;
 
                 if (math.abs(_move.x) > 0)
-                    targetVelocity *= playerSettings.sidewaysSpeedMultiplier;
+                    targetVelocity *= playerSettings.sidewaysSpeedModifier;
             }
             else if (_move.y < 0)
-                targetVelocity = playerSettings.forwardSpeed * playerSettings.backwardSpeedMultiplier;
+                targetVelocity = playerSettings.forwardSpeed * playerSettings.backwardSpeedModifier;
 
 
             if (_currentStance is PlayerSettings.PlayerStance.Crouch)
-                targetVelocity *= playerSettings.crouchSpeedMultiplier;
+                targetVelocity *= playerSettings.crouchSpeedModifier;
             if (_currentStance is PlayerSettings.PlayerStance.Prone)
-                targetVelocity *= playerSettings.proneSpeedMultiplier;
+                targetVelocity *= playerSettings.proneSpeedModifier;
         }
 
+        if (currentWeapon.isAiming)
+        {
+            if (_currentStance == PlayerSettings.PlayerStance.Prone)
+                targetVelocity = 0;
+            else
+                targetVelocity *= playerSettings.aimingSpeedModifier;
+        }
+        
         return targetVelocity;
     }
     
@@ -249,12 +258,6 @@ public class CharacterControllerScript : MonoBehaviour
             
             _currentStance = PlayerSettings.PlayerStance.Crouch;
         }
-    }
-
-    private void ToggleSprinting(bool isAiming)
-    {
-        if (isAiming)
-            _isSprinting = false;
     }
 
     private bool CheckObstaclesOverhead()

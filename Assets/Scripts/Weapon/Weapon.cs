@@ -67,11 +67,20 @@ public class Weapon : MonoBehaviour
 
     private void CalculateSway()
     {
+        float swayIntensityX = settings.swayIntensityX;
+        float swayIntensityY = settings.swayIntensityY;
+
+        if (isAiming)
+        {
+            swayIntensityX *= settings.aimingSwayIntensityModifier;
+            swayIntensityY *= settings.aimingSwayIntensityModifier;
+        }
+        
         Quaternion rotationX =
-            Quaternion.AngleAxis(_playerLook.x * settings.swayIntensityX * (settings.swayInvertedX ? -1 : 1),
+            Quaternion.AngleAxis(_playerLook.x * swayIntensityX * (settings.swayInvertedX ? -1 : 1),
                 Vector3.up);
         Quaternion rotationY =
-            Quaternion.AngleAxis(_playerLook.y * settings.swayIntensityY * (settings.swayInvertedY ? -1 : 1),
+            Quaternion.AngleAxis(_playerLook.y * swayIntensityY * (settings.swayInvertedY ? -1 : 1),
                 Vector3.right);
 
         rotationX.y = Math.Clamp(rotationX.y, -settings.swayClampX, settings.swayClampX);
