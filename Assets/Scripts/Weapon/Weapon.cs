@@ -1,12 +1,15 @@
 using System;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Events;
+using Random = UnityEngine.Random;
 
 public class Weapon : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
 
     public static UnityEvent<bool> onPlayerAiming = new();
+    public static UnityEvent<Vector2> onPlayerShoot = new();
     
     private InputActions _input;
     public WeaponSettings settings;
@@ -25,6 +28,9 @@ public class Weapon : MonoBehaviour
     private Vector2 _playerMove;
     private float _characterVelocity;
 
+    private Vector3 _recoilPosOffset;
+    private Vector3 _recoilRotOffset;
+
     private void Awake()
     {
         _input = new InputActions();
@@ -32,11 +38,12 @@ public class Weapon : MonoBehaviour
         _input.Player.Move.performed += e => _playerMove = e.ReadValue<Vector2>();
         _input.Player.Sprint.performed += e => _isSprinting = !isAiming;
         _input.Player.Sprint.canceled += e => _isSprinting = false;
+        
         _input.Weapon.Aim.performed += e => StartAiming();
         _input.Weapon.Aim.canceled += e => FinishAiming();
-
-        Cursor.visible = false;
-
+        _input.Weapon.Fire.performed += e => Fire();
+        
+        
         _originRotation = transform.localRotation;
     }
 
@@ -45,6 +52,8 @@ public class Weapon : MonoBehaviour
         CharacterControllerScript.onPlayerJump.AddListener(SetJumpingAnimation);
         CharacterControllerScript.onPlayerLands.AddListener(SetLandingAnimation);
         CharacterControllerScript.onPlayerFalling.AddListener(SetFallingAnimation);
+        
+        Cursor.visible = false;
     }
 
     private void OnEnable()
@@ -62,6 +71,7 @@ public class Weapon : MonoBehaviour
         CalculateSway();
         CalculateMovementSway();
         CalculateAiming();
+        CalculateRecoil();
         SetAnimations();
     }
 
@@ -197,8 +207,28 @@ public class Weapon : MonoBehaviour
         _characterVelocity = normVelocity;
     }
 
-    
-        
+    private void Fire()
+    {
+        Vector2 recoil = Vector2.zero;
+        recoil.x = Random.Range(-settings.recoilAmountX, settings.recoilAmountX);
+        recoil.y = Random.Range(settings.recoilMinAmountY, settings.recoilMaxAmountY);
+        if (isAiming)
+            recoil *= settings.aimingRecoilAmountModifier;
+
+        _recoilPosOffset = settings.recoilPositionOffset * (isAiming ? settings.aimingRecoilAmountModifier : 1);
+        _recoilRotOffset = settings.recoilRotationOffset * (isAiming ? settings.aimingRecoilAmountModifier : 1);
+
+        onPlayerShoot.Invoke(recoil);
+    }
+
+    private void CalculateRecoil()
+    {
+        _recoilPosOffset = Vector3.Lerp(_recoilPosOffset, Vector3.zero, Time.deltaTime * settings.recoilSmooth);
+        _recoilRotOffset = Vector3.Lerp(_recoilRotOffset, Vector3.zero, Time.deltaTime * settings.recoilSmooth);
+
+        transform.localPosition += _recoilPosOffset;
+        transform.localRotation = quaternion.Euler(_recoilRotOffset);
+    }
     
 
 }
