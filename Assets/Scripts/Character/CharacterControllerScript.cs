@@ -90,7 +90,7 @@ public class CharacterControllerScript : MonoBehaviour
         _verticalRotation += _look.y * sensY * Time.deltaTime *
                             (playerSettings.mouseInvertedY ? 1 : -1);
 
-        _recoil = Vector2.Lerp(_recoil, Vector2.zero, Time.deltaTime * 10);
+        _recoil = Vector2.Lerp(_recoil, Vector2.zero, Time.deltaTime * currentWeapon.settings.recoilSmooth);
 
         _horizontalRotation += _recoil.x;
         _verticalRotation -= _recoil.y;

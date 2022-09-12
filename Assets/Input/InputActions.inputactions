@@ -221,6 +221,17 @@
                 },
                 {
                     "name": "",
+                    "id": "6c86a750-d8da-4386-8fc9-ba03644b4a88",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "a677519c-f02c-46fd-bfce-079a4c735cc6",
                     "path": "<Mouse>/leftButton",
                     "interactions": "Tap",

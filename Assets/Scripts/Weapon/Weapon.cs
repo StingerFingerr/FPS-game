@@ -210,19 +210,21 @@ public class Weapon : MonoBehaviour
     private void Fire()
     {
         Vector2 recoil = Vector2.zero;
-        recoil.x = Random.Range(-.3f, .3f);
-        recoil.y = Random.Range(.2f, .4f);
+        recoil.x = Random.Range(-settings.recoilAmountX, settings.recoilAmountX);
+        recoil.y = Random.Range(settings.recoilMinAmountY, settings.recoilMaxAmountY);
+        if (isAiming)
+            recoil *= settings.aimingRecoilAmountModifier;
 
-        _recoilPosOffset = new Vector3(0, 0, -.01f);
-        _recoilRotOffset = new Vector3(-.1f, 0f, 0f);
+        _recoilPosOffset = settings.recoilPositionOffset * (isAiming ? settings.aimingRecoilAmountModifier : 1);
+        _recoilRotOffset = settings.recoilRotationOffset * (isAiming ? settings.aimingRecoilAmountModifier : 1);
 
         onPlayerShoot.Invoke(recoil);
     }
 
     private void CalculateRecoil()
     {
-        _recoilPosOffset = Vector3.Lerp(_recoilPosOffset, Vector3.zero, Time.deltaTime * 10f);
-        _recoilRotOffset = Vector3.Lerp(_recoilRotOffset, Vector3.zero, Time.deltaTime * 10f);
+        _recoilPosOffset = Vector3.Lerp(_recoilPosOffset, Vector3.zero, Time.deltaTime * settings.recoilSmooth);
+        _recoilRotOffset = Vector3.Lerp(_recoilRotOffset, Vector3.zero, Time.deltaTime * settings.recoilSmooth);
 
         transform.localPosition += _recoilPosOffset;
         transform.localRotation = quaternion.Euler(_recoilRotOffset);
