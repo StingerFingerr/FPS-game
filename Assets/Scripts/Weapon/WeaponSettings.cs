@@ -24,5 +24,17 @@ public class WeaponSettings : ScriptableObject
     public float movementSwayClampY = 20f;
     public float movementSwaySmooth = 3f;
 
+    [Header("Recoil")]
+    public float recoilAmountX;
+    public float recoilMinAmountY;
+    public float recoilMaxAmountY;
+    public float aimingRecoilAmountModifier;
+    public float recoilSmooth;
+    public Vector3 recoilPositionOffset;
+    public Vector3 recoilRotationOffset;
+
+
+
+
 
 }

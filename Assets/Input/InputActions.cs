@@ -218,6 +218,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""4ef5bacf-19a0-45c3-90ac-df13f84ad2f3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -229,6 +238,28 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Aim"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6c86a750-d8da-4386-8fc9-ba03644b4a88"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Aim"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a677519c-f02c-46fd-bfce-079a4c735cc6"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": ""Tap"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -248,6 +279,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         // Weapon
         m_Weapon = asset.FindActionMap("Weapon", throwIfNotFound: true);
         m_Weapon_Aim = m_Weapon.FindAction("Aim", throwIfNotFound: true);
+        m_Weapon_Fire = m_Weapon.FindAction("Fire", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -381,11 +413,13 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Weapon;
     private IWeaponActions m_WeaponActionsCallbackInterface;
     private readonly InputAction m_Weapon_Aim;
+    private readonly InputAction m_Weapon_Fire;
     public struct WeaponActions
     {
         private @InputActions m_Wrapper;
         public WeaponActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Aim => m_Wrapper.m_Weapon_Aim;
+        public InputAction @Fire => m_Wrapper.m_Weapon_Fire;
         public InputActionMap Get() { return m_Wrapper.m_Weapon; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -398,6 +432,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Aim.started -= m_Wrapper.m_WeaponActionsCallbackInterface.OnAim;
                 @Aim.performed -= m_Wrapper.m_WeaponActionsCallbackInterface.OnAim;
                 @Aim.canceled -= m_Wrapper.m_WeaponActionsCallbackInterface.OnAim;
+                @Fire.started -= m_Wrapper.m_WeaponActionsCallbackInterface.OnFire;
+                @Fire.performed -= m_Wrapper.m_WeaponActionsCallbackInterface.OnFire;
+                @Fire.canceled -= m_Wrapper.m_WeaponActionsCallbackInterface.OnFire;
             }
             m_Wrapper.m_WeaponActionsCallbackInterface = instance;
             if (instance != null)
@@ -405,6 +442,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Aim.started += instance.OnAim;
                 @Aim.performed += instance.OnAim;
                 @Aim.canceled += instance.OnAim;
+                @Fire.started += instance.OnFire;
+                @Fire.performed += instance.OnFire;
+                @Fire.canceled += instance.OnFire;
             }
         }
     }
@@ -421,5 +461,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     public interface IWeaponActions
     {
         void OnAim(InputAction.CallbackContext context);
+        void OnFire(InputAction.CallbackContext context);
     }
 }

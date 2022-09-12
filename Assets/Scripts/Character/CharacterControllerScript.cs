@@ -30,6 +30,8 @@ public class CharacterControllerScript : MonoBehaviour
     public float checkSphereRadius;
 
     public Weapon currentWeapon;
+
+    private Vector2 _recoil;
     
     private void Awake()
     {
@@ -43,6 +45,11 @@ public class CharacterControllerScript : MonoBehaviour
         _input.Player.Prone.performed += e => ToggleProne();
         
         _characterController = GetComponent<CharacterController>();
+    }
+
+    private void Start()
+    {
+        Weapon.onPlayerShoot.AddListener(e => _recoil = e);
     }
 
     private void OnEnable()
@@ -83,6 +90,11 @@ public class CharacterControllerScript : MonoBehaviour
         _verticalRotation += _look.y * sensY * Time.deltaTime *
                             (playerSettings.mouseInvertedY ? 1 : -1);
 
+        _recoil = Vector2.Lerp(_recoil, Vector2.zero, Time.deltaTime * currentWeapon.settings.recoilSmooth);
+
+        _horizontalRotation += _recoil.x;
+        _verticalRotation -= _recoil.y;
+        
         _verticalRotation = Mathf.Clamp(_verticalRotation, playerSettings.bottomClamp, playerSettings.topClamp);
 
         fpsCameraTransform.localRotation = Quaternion.Euler(_verticalRotation, 0, 0);
