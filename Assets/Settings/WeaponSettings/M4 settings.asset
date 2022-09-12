@@ -16,12 +16,13 @@ MonoBehaviour:
   aimingTime: 10
   swayIntensityX: 0.5
   swayIntensityY: 0.5
+  aimingSwayIntensityModifier: 0.25
   swayInvertedX: 1
   swayInvertedY: 0
   swayClampX: 0.15
   swayClampY: 0.15
   swaySmooth: 10
-  movementSwayIntensity: 10
-  movementSwayClampX: 10
-  movementSwayClampY: 10
+  movementSwayIntensity: 40
+  movementSwayClampX: 20
+  movementSwayClampY: 20
   movementSwaySmooth: 1
