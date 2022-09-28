@@ -21,16 +21,17 @@ namespace Character
         public bool IsAiming { get; private set; }
 
         private IInputService _input;
+        private InputActions _inputActions;
         private CharacterController _characterController;
 
         private float _verticalVelocity;
 
-        private Weapon.Weapon _currentWeapon;
+        public Weapon.Weapon currentWeapon;
 
         private PlayerSettings.PlayerStance _currentStance = PlayerSettings.PlayerStance.Normal;
         private float _verticalRotation;
         private float _horizontalRotation;
-        private Vector2 _recoil;
+        private Vector2 _recoil = Vector2.zero;
         private bool IsProneStance => _currentStance is PlayerSettings.PlayerStance.Prone;
         private bool IsCrouchStance => _currentStance is PlayerSettings.PlayerStance.Crouch;
         private bool IsStand => _currentStance is PlayerSettings.PlayerStance.Normal;
@@ -45,7 +46,9 @@ namespace Character
 
         private void Subscribe()
         {
-            _input.Move += Move;
+            _inputActions = new InputActions();
+            _inputActions.Enable();
+
             _input.Look += Look;
             _input.StartSprinting += () => IsSprinting = true;
             _input.FinishSprinting += () => IsSprinting = false;
@@ -60,10 +63,15 @@ namespace Character
             _characterController = GetComponent<CharacterController>();
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
+            Move();
             CheckGround();
             CalculateVerticalVelocity();
+        }
+
+        private void Update()
+        {
             CalculateStance();
         }
 
@@ -83,7 +91,8 @@ namespace Character
             _verticalRotation += look.y * sensY * Time.deltaTime *
                                  (playerSettings.mouseInvertedY ? 1 : -1);
 
-            _recoil = Vector2.Lerp(_recoil, Vector2.zero, Time.deltaTime * _currentWeapon.recoil.recoilSmooth);
+            float recoilSmooth = currentWeapon ? 1 : currentWeapon.recoil.recoilSmooth;
+            _recoil = Vector2.Lerp(_recoil, Vector2.zero, Time.deltaTime * recoilSmooth);
 
             _horizontalRotation += _recoil.x;
             _verticalRotation -= _recoil.y;
@@ -95,9 +104,10 @@ namespace Character
 
         }
 
-        private void Move(Vector2 move)
+        private void Move()
         {
-            Debug.Log(Time.time);
+            Vector2 move = _input.GetMove();
+            
             CheckSprinting(move);
 
             Vector3 currentMoving = _characterController.velocity;
@@ -180,7 +190,7 @@ namespace Character
                 return;
 
             if(math.abs(_verticalVelocity)< terminalVerticalVelocity)
-                _verticalVelocity -= playerSettings.gravityValue * Time.deltaTime;
+                _verticalVelocity -= playerSettings.gravityValue * Time.fixedDeltaTime;
         }
 
         private void CalculateStance()
@@ -277,10 +287,10 @@ namespace Character
 
         private void Fire()
         {
-            if (_currentWeapon is null)
+            if (currentWeapon is null)
                 return;
 
-            _recoil = _currentWeapon.recoil.GetRecoilAmount();
+            _recoil = currentWeapon.recoil.GetRecoilAmount();
         }
     }
 }

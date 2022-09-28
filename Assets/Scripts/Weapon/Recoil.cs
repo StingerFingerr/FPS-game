@@ -64,7 +64,7 @@ namespace Weapon
             _recoilRotOffset = Vector3.Lerp(_recoilRotOffset, Vector3.zero, Time.fixedDeltaTime * recoilSmooth);
 
             transform.localPosition += _recoilPosOffset;
-            transform.localRotation = quaternion.Euler(_recoilRotOffset);
+            transform.localRotation *= quaternion.Euler(_recoilRotOffset);
         }
 
         private float AimingRecoilModifier() => 

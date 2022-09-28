@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dc043ab61ba49e5bf7ed8a04c0f75b4, type: 3}
   m_Name: SwaySettings
   m_EditorClassIdentifier: 
-  swayIntensityX: 0.5
-  swayIntensityY: 0.5
+  swayIntensityX: 0.3
+  swayIntensityY: 0.3
   aimingSwayIntensityModifier: 0.5
   swayInvertedX: 1
   swayInvertedY: 0
-  swayClampX: 0.15
-  swayClampY: 0.15
-  swaySmooth: 10
-  movementSwayIntensity: 10
-  movementSwayClampX: 20
-  movementSwayClampY: 20
-  movementSwaySmooth: 3
+  swayClampX: 10
+  swayClampY: 10
+  swaySmooth: 3
+  movementSwayIntensity: 2
+  movementSwayClampX: 10
+  movementSwayClampY: 10
+  movementSwaySmooth: 10

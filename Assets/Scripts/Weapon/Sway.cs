@@ -2,6 +2,7 @@
 using Character;
 using Services.Input;
 using UnityEngine;
+using Zenject;
 
 namespace Weapon
 {
@@ -14,6 +15,7 @@ namespace Weapon
 
         private Quaternion _originRotation;
 
+        [Inject]
         private void Construct(CharacterControllerScript player, IInputService input)
         {
             _player = player;
@@ -25,11 +27,18 @@ namespace Weapon
         private void Subscribe()
         {
             _input.Look += CalculateSway;
-            _input.Move += CalculateMovementSway;
-            
+        }
+
+        private void Start()
+        {
             _originRotation = transform.localRotation;
         }
-        
+
+        private void FixedUpdate()
+        {
+            CalculateMovementSway();
+        }
+
         private void CalculateSway(Vector2 look)
         {
             float swayIntensityX = settings.swayIntensityX;
@@ -51,14 +60,16 @@ namespace Weapon
             rotationX.y = Math.Clamp(rotationX.y, -settings.swayClampX, settings.swayClampX);
             rotationY.x = Math.Clamp(rotationY.x, -settings.swayClampY, settings.swayClampY);
 
-            Quaternion targetRotation = _originRotation * rotationX * rotationY;
+            Quaternion targetRotation =  rotationX * rotationY;
 
             transform.localRotation =
                 Quaternion.Lerp(transform.localRotation, targetRotation, Time.deltaTime * settings.swaySmooth);
         }
 
-        private void CalculateMovementSway(Vector2 move)
+        private void CalculateMovementSway()
         {
+            Vector2 move = _input.GetMove();
+            
             Quaternion rotationX = Quaternion.AngleAxis(move.y * settings.movementSwayIntensity, Vector3.right);
             Quaternion rotationZ = Quaternion.AngleAxis(move.x * settings.movementSwayIntensity, Vector3.forward);
 
@@ -67,8 +78,8 @@ namespace Weapon
 
             Quaternion targetRotation = _originRotation * rotationX * rotationZ;
 
-            transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation,
-                Time.deltaTime * settings.movementSwaySmooth);
+            transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, 
+                    Time.fixedDeltaTime * settings.movementSwaySmooth);
         
         }
     }
