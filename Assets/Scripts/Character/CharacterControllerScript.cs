@@ -2,6 +2,7 @@ using System;
 using Services.Input;
 using Unity.Mathematics;
 using UnityEngine;
+using Zenject;
 
 namespace Character
 {
@@ -34,6 +35,7 @@ namespace Character
         private bool IsCrouchStance => _currentStance is PlayerSettings.PlayerStance.Crouch;
         private bool IsStand => _currentStance is PlayerSettings.PlayerStance.Normal;
 
+        [Inject]
         private void Construct(IInputService input)
         {
             _input = input;
@@ -95,10 +97,12 @@ namespace Character
 
         private void Move(Vector2 move)
         {
+            Debug.Log(Time.time);
             CheckSprinting(move);
 
             Vector3 currentMoving = _characterController.velocity;
             currentMoving.y = 0;
+            
             float currentVelocity = currentMoving.magnitude;
             float targetVelocity = CalculateTargetVelocity(move);
 

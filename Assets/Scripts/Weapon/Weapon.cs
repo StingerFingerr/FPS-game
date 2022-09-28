@@ -1,6 +1,7 @@
 using Character;
 using Services.Input;
 using UnityEngine;
+using Zenject;
 
 namespace Weapon
 {
@@ -14,6 +15,7 @@ namespace Weapon
         private IInputService _input;
         private CharacterControllerScript _player;
         
+        [Inject]
         private void Construct(CharacterControllerScript player, IInputService input)
         {
             _player = player;

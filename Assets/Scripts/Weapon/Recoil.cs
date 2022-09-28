@@ -2,6 +2,7 @@
 using Services.Input;
 using Unity.Mathematics;
 using UnityEngine;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace Weapon
@@ -21,6 +22,7 @@ namespace Weapon
         private CharacterControllerScript _player;
         private IInputService _input;
     
+        [Inject]
         private void Construct(CharacterControllerScript player, IInputService input)
         {
             _player = player;

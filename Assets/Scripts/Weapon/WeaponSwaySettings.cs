@@ -2,6 +2,7 @@
 
 namespace Weapon
 {
+    [CreateAssetMenu(order = 3, fileName = "gun_SwaySettings", menuName = "ScriptableObjects/WeaponSwaySettings")]
     public class WeaponSwaySettings: ScriptableObject
     {
         [Header("Sway")]
