@@ -1,234 +1,50 @@
-using System;
-using Unity.Mathematics;
+using Character;
+using Services.Input;
 using UnityEngine;
-using UnityEngine.Events;
-using Random = UnityEngine.Random;
+using Zenject;
 
-public class Weapon : MonoBehaviour
+namespace Weapon
 {
-    [SerializeField] private Animator _animator;
-
-    public static UnityEvent<bool> onPlayerAiming = new();
-    public static UnityEvent<Vector2> onPlayerShoot = new();
-    
-    private InputActions _input;
-    public WeaponSettings settings;
-
-    public Vector3 hipPosition;
-    public Vector3 aimPosition;
-
-    public bool isAiming { get; private set; }
-    private Quaternion _originRotation;
-
-    private bool _isSprinting;
-    private bool _isJumping;
-    private bool _isFalling;
-    
-    private Vector2 _playerLook;
-    private Vector2 _playerMove;
-    private float _characterVelocity;
-
-    private Vector3 _recoilPosOffset;
-    private Vector3 _recoilRotOffset;
-
-    private void Awake()
+    public class Weapon : MonoBehaviour
     {
-        _input = new InputActions();
-        _input.Player.Look.performed += e => _playerLook = e.ReadValue<Vector2>();
-        _input.Player.Move.performed += e => _playerMove = e.ReadValue<Vector2>();
-        _input.Player.Sprint.performed += e => _isSprinting = !isAiming;
-        _input.Player.Sprint.canceled += e => _isSprinting = false;
+        public WeaponSettings settings;
+        public Vector3 hipPosition;
+        public Vector3 aimPosition;
+        public Recoil recoil;
+
+        private IInputService _input;
+        private CharacterControllerScript _player;
         
-        _input.Weapon.Aim.performed += e => StartAiming();
-        _input.Weapon.Aim.canceled += e => FinishAiming();
-        _input.Weapon.Fire.performed += e => Fire();
-        
-        
-        _originRotation = transform.localRotation;
-    }
-
-    private void Start()
-    {
-        CharacterControllerScript.onPlayerJump.AddListener(SetJumpingAnimation);
-        CharacterControllerScript.onPlayerLands.AddListener(SetLandingAnimation);
-        CharacterControllerScript.onPlayerFalling.AddListener(SetFallingAnimation);
-        
-        Cursor.visible = false;
-    }
-
-    private void OnEnable()
-    {
-        _input.Enable();
-    }
-
-    private void OnDisable()
-    {
-        _input.Disable();
-    }
-
-    private void Update()
-    {
-        CalculateSway();
-        CalculateMovementSway();
-        CalculateAiming();
-        CalculateRecoil();
-        SetAnimations();
-    }
-
-    private void CalculateSway()
-    {
-        float swayIntensityX = settings.swayIntensityX;
-        float swayIntensityY = settings.swayIntensityY;
-
-        if (isAiming)
+        [Inject]
+        private void Construct(CharacterControllerScript player, IInputService input)
         {
-            swayIntensityX *= settings.aimingSwayIntensityModifier;
-            swayIntensityY *= settings.aimingSwayIntensityModifier;
-        }
-        
-        Quaternion rotationX =
-            Quaternion.AngleAxis(_playerLook.x * swayIntensityX * (settings.swayInvertedX ? -1 : 1),
-                Vector3.up);
-        Quaternion rotationY =
-            Quaternion.AngleAxis(_playerLook.y * swayIntensityY * (settings.swayInvertedY ? -1 : 1),
-                Vector3.right);
-
-        rotationX.y = Math.Clamp(rotationX.y, -settings.swayClampX, settings.swayClampX);
-        rotationY.x = Math.Clamp(rotationY.x, -settings.swayClampY, settings.swayClampY);
-
-        Quaternion targetRotation = _originRotation * rotationX * rotationY;
-
-        transform.localRotation =
-            Quaternion.Lerp(transform.localRotation, targetRotation, Time.deltaTime * settings.swaySmooth);
-    }
-
-    private void CalculateMovementSway()
-    {
-        Quaternion rotationX = Quaternion.AngleAxis(_playerMove.y * settings.movementSwayIntensity, Vector3.right);
-        Quaternion rotationZ = Quaternion.AngleAxis(_playerMove.x * settings.movementSwayIntensity, Vector3.forward);
-
-        rotationX.x = Math.Clamp(rotationX.x, -settings.movementSwayClampY, settings.movementSwayClampY);
-        rotationZ.z = Math.Clamp(rotationZ.z, -settings.movementSwayClampX, settings.movementSwayClampX);
-
-        Quaternion targetRotation = _originRotation * rotationX * rotationZ;
-
-        transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation,
-            Time.deltaTime * settings.movementSwaySmooth);
-        
-    }
-
-    private void CalculateAiming()
-    {
-        if (isAiming)
-            transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition, Time.deltaTime * settings.aimingTime);
-        else
-            transform.localPosition = Vector3.Lerp(transform.localPosition, hipPosition, Time.deltaTime * settings.aimingTime);
-    }
-
-    private void SetAnimations()
-    {
-        if (_isJumping)
-            return;
-
-        if (isAiming)
-        {
-            _animator.speed = 0;
-            if(_animator.speed < .05f)
-                _animator.enabled = false;  
+            _player = player;
+            _input = input;
             
-            _animator.transform.localPosition =
-                Vector3.Lerp(_animator.transform.localPosition, Vector3.zero, Time.deltaTime * settings.aimingTime);
-            _animator.transform.localRotation = Quaternion.Lerp(_animator.transform.localRotation,
-                Quaternion.Euler(0f, 0f, 0f), Time.deltaTime * settings.aimingTime);
-            return;
+            Subscribe();
         }
-        
-        _animator.enabled = true;
-        
-        if (_playerMove == Vector2.zero)
+
+        private void Subscribe()
         {
-            _animator.speed = 1;
-            _animator.SetBool("isIdle", true);
-            return;
+            _input.Fire += Fire;
+        }
+        
+        private void Update()
+        {
+            CalculateAiming();
         }
 
-        _animator.SetBool("isIdle", false);
-        _animator.SetBool("isSprinting", _isSprinting);
-        _animator.speed = Mathf.Lerp(_animator.speed, _characterVelocity, Time.deltaTime * 10f);
+        private void CalculateAiming()
+        {
+            if (_player.IsAiming)
+                transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition, Time.deltaTime * settings.aimingTime);
+            else
+                transform.localPosition = Vector3.Lerp(transform.localPosition, hipPosition, Time.deltaTime * settings.aimingTime);
+        }
+
+        private void Fire()
+        {
+
+        }
     }
-
-    private void SetJumpingAnimation()
-    {
-        _isJumping = true;
-
-        _animator.speed = 1;
-        _animator.SetTrigger("isJumping");
-    }
-
-    private void SetFallingAnimation()
-    {
-        if(_isFalling)
-            return;
-
-        _isFalling = true;
-
-        _animator.speed = 1;
-        _animator.SetTrigger("isFalling");
-    }
-    
-    private void SetLandingAnimation()
-    {
-        _isJumping = false;
-        _isFalling = false;
-        _animator.speed = 1;
-
-        _animator.SetTrigger("isLanding");
-    }
-
-    private void StartAiming()
-    {
-        if(_isSprinting)
-            return;
-        if(_isFalling)
-            return;
-          
-        isAiming = true;
-        onPlayerAiming.Invoke(isAiming);
-    }
-
-    private void FinishAiming()
-    {
-        isAiming = false;
-        onPlayerAiming.Invoke(isAiming);
-    }
-    
-    public void SetCharacterVelocity(float normVelocity)
-    {
-        _characterVelocity = normVelocity;
-    }
-
-    private void Fire()
-    {
-        Vector2 recoil = Vector2.zero;
-        recoil.x = Random.Range(-settings.recoilAmountX, settings.recoilAmountX);
-        recoil.y = Random.Range(settings.recoilMinAmountY, settings.recoilMaxAmountY);
-        if (isAiming)
-            recoil *= settings.aimingRecoilAmountModifier;
-
-        _recoilPosOffset = settings.recoilPositionOffset * (isAiming ? settings.aimingRecoilAmountModifier : 1);
-        _recoilRotOffset = settings.recoilRotationOffset * (isAiming ? settings.aimingRecoilAmountModifier : 1);
-
-        onPlayerShoot.Invoke(recoil);
-    }
-
-    private void CalculateRecoil()
-    {
-        _recoilPosOffset = Vector3.Lerp(_recoilPosOffset, Vector3.zero, Time.deltaTime * settings.recoilSmooth);
-        _recoilRotOffset = Vector3.Lerp(_recoilRotOffset, Vector3.zero, Time.deltaTime * settings.recoilSmooth);
-
-        transform.localPosition += _recoilPosOffset;
-        transform.localRotation = quaternion.Euler(_recoilRotOffset);
-    }
-    
-
 }
