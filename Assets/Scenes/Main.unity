@@ -1149,17 +1149,17 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 521716803}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 87a50f868ce34b8495741fdebb5d31b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recoilSmooth: 10
-  recoilAmountX: 10
-  recoilMinAmountY: 10
-  recoilMaxAmountY: 10
-  recoilPositionOffset: {x: 0, y: 0, z: 0.15}
-  recoilRotationOffset: {x: -2, y: 0, z: 0}
+  recoilSmooth: 30
+  recoilAmountX: 0.3
+  recoilMinAmountY: 0.6
+  recoilMaxAmountY: 1
+  recoilPositionOffset: {x: 0, y: 0, z: -0.1}
+  recoilRotationOffset: {x: -0.1, y: 0, z: 0}
   aimingRecoilAmountModifier: 0.5
 --- !u!1 &526290402
 GameObject:
@@ -1399,6 +1399,7 @@ GameObject:
   m_Component:
   - component: {fileID: 684211220}
   - component: {fileID: 684211221}
+  - component: {fileID: 684211222}
   m_Layer: 7
   m_Name: Animations
   m_TagString: Untagged
@@ -1430,7 +1431,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 684211219}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 5916cfb8d88c6eb4098494004e46f021, type: 2}
   m_CullingMode: 0
@@ -1442,6 +1443,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &684211222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684211219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d3236223f644eeaa567856ddecf4ed1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 684211221}
 --- !u!1 &762261520
 GameObject:
   m_ObjectHideFlags: 0

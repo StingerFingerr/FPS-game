@@ -14,6 +14,7 @@ namespace Weapon
         private IInputService _input;
 
         private Quaternion _originRotation;
+        private Quaternion _targetRotation;
 
         [Inject]
         private void Construct(CharacterControllerScript player, IInputService input)
@@ -26,7 +27,7 @@ namespace Weapon
 
         private void Subscribe()
         {
-            _input.Look += CalculateSway;
+            
         }
 
         private void Start()
@@ -36,11 +37,21 @@ namespace Weapon
 
         private void FixedUpdate()
         {
+            SetSway();
+            CalculateSway();
             CalculateMovementSway();
         }
 
-        private void CalculateSway(Vector2 look)
+        private void CalculateSway()
         {
+            transform.localRotation = Quaternion.Lerp(transform.localRotation,
+                transform.localRotation * _targetRotation, Time.fixedDeltaTime * settings.swaySmooth);
+        }
+
+        private void SetSway()
+        {
+            Vector2 look = _input.GetLook();
+            
             float swayIntensityX = settings.swayIntensityX;
             float swayIntensityY = settings.swayIntensityY;
 
@@ -60,10 +71,10 @@ namespace Weapon
             rotationX.y = Math.Clamp(rotationX.y, -settings.swayClampX, settings.swayClampX);
             rotationY.x = Math.Clamp(rotationY.x, -settings.swayClampY, settings.swayClampY);
 
-            Quaternion targetRotation =  rotationX * rotationY;
+            _targetRotation = rotationX * rotationY;
 
-            transform.localRotation =
-                Quaternion.Lerp(transform.localRotation, targetRotation, Time.deltaTime * settings.swaySmooth);
+            //transform.localRotation =
+            //    Quaternion.Lerp(transform.localRotation, targetRotation, Time.deltaTime * settings.swaySmooth);
         }
 
         private void CalculateMovementSway()

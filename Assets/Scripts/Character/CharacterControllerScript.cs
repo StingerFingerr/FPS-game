@@ -14,6 +14,7 @@ namespace Character
         public PlayerSettings playerSettings;
         public float terminalVerticalVelocity = 10;
 
+        public event Action PlayerJump;
         public event Action PlayerFalling;
         public event Action PlayerLands;
         public bool IsSprinting { get; private set; }
@@ -49,7 +50,6 @@ namespace Character
             _inputActions = new InputActions();
             _inputActions.Enable();
 
-            _input.Look += Look;
             _input.StartSprinting += () => IsSprinting = true;
             _input.FinishSprinting += () => IsSprinting = false;
             _input.Jump += Jump;
@@ -75,8 +75,15 @@ namespace Character
             CalculateStance();
         }
 
-        private void Look(Vector2 look)
+        private void LateUpdate()
         {
+            Look();
+        }
+
+        private void Look()
+        {
+            Vector2 look = _input.GetLook();
+            
             float sensX = playerSettings.mouseSensitivityX;
             float sensY = playerSettings.mouseSensitivityY;
 
@@ -91,7 +98,7 @@ namespace Character
             _verticalRotation += look.y * sensY * Time.deltaTime *
                                  (playerSettings.mouseInvertedY ? 1 : -1);
 
-            float recoilSmooth = currentWeapon ? 1 : currentWeapon.recoil.recoilSmooth;
+            float recoilSmooth = currentWeapon ? currentWeapon.recoil.recoilSmooth : 1;
             _recoil = Vector2.Lerp(_recoil, Vector2.zero, Time.deltaTime * recoilSmooth);
 
             _horizontalRotation += _recoil.x;
@@ -230,6 +237,7 @@ namespace Character
                 return;
         
             _verticalVelocity = Mathf.Sqrt(playerSettings.jumpingHeight * 2f * playerSettings.gravityValue);
+            PlayerJump?.Invoke();
         }
 
         private void ToggleCrouch()
