@@ -1,220 +1,304 @@
 using System;
+using Services.Input;
 using Unity.Mathematics;
 using UnityEngine;
+using Zenject;
 
-public class CharacterControllerScript : MonoBehaviour
+namespace Character
 {
-    private CharacterController _characterController;
-    public Transform fpsCameraTransform;
-    private InputActions _input;
-    public PlayerSettings playerSettings;
-
-    private PlayerSettings.PlayerStance _currentStance = PlayerSettings.PlayerStance.Normal;
-
-    private Vector2 _move;
-    private Vector2 _look;
-    private float verticalRotation;
-    private float horizontalRotation;
-    private bool _isSprinting;
-    private bool _isGrounded;
-
-    private float _verticalVelocity;
-    public float terminalVerticalVelocity = 10;
-
-    public LayerMask ObstaclesLayerMask;
-    public float checkSphereRadius;
-    
-    private void Awake()
+    public class CharacterControllerScript : MonoBehaviour
     {
-        _input = new InputActions();
-        _input.Player.Move.performed += e => _move = e.ReadValue<Vector2>();
-        _input.Player.Look.performed += e => _look = e.ReadValue<Vector2>();
-        _input.Player.Sprint.performed += e => _isSprinting = true;
-        _input.Player.Sprint.canceled += e => _isSprinting = false;
-        _input.Player.Jump.performed += e => Jump();
-        _input.Player.Crouch.performed += e => ToggleCrouch();
-        _input.Player.Prone.performed += e => ToggleProne();
-        _input.Enable();
+        public LayerMask obstaclesLayerMask;
+        public float checkSphereRadius;
+        public Transform fpsCameraTransform;
+        public PlayerSettings playerSettings;
+        public float terminalVerticalVelocity = 10;
 
-        _characterController = GetComponent<CharacterController>();
-    }
+        public event Action PlayerJump;
+        public event Action PlayerFalling;
+        public event Action PlayerLands;
+        public bool IsSprinting { get; private set; }
+        public bool IsGrounded { get; private set; }
+        public bool IsAiming { get; private set; }
 
-    private void Update()
-    {
-        _isGrounded = _characterController.isGrounded;
-        CalculateVerticalVelocity();
-        Move();
-        CalculateStance();
-    }
+        private IInputService _input;
+        private InputActions _inputActions;
+        private CharacterController _characterController;
 
-    private void LateUpdate()
-    {
-        Look();
-    }
+        private float _verticalVelocity;
 
-    private void Look()
-    {
-        horizontalRotation = _look.x * playerSettings.mouseSensitivityX * Time.deltaTime *
-                             (playerSettings.mouseInvertedX ? 1 : -1);
-        verticalRotation += _look.y * playerSettings.mouseSensitivityY * Time.deltaTime *
-                            (playerSettings.mouseInvertedY ? 1 : -1);
+        public Weapon.Weapon currentWeapon;
 
-        verticalRotation = Mathf.Clamp(verticalRotation, playerSettings.bottomClamp, playerSettings.topClamp);
+        private PlayerSettings.PlayerStance _currentStance = PlayerSettings.PlayerStance.Normal;
+        private float _verticalRotation;
+        private float _horizontalRotation;
+        private Vector2 _recoil = Vector2.zero;
+        private bool IsProneStance => _currentStance is PlayerSettings.PlayerStance.Prone;
+        private bool IsCrouchStance => _currentStance is PlayerSettings.PlayerStance.Crouch;
+        private bool IsStand => _currentStance is PlayerSettings.PlayerStance.Normal;
 
-        fpsCameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0, 0);
-        transform.Rotate(Vector3.up, horizontalRotation);
-
-    }
-
-    private void Move()
-    {
-        CheckSprinting();
-
-        Vector3 currentMoving = _characterController.velocity;
-        currentMoving.y = 0;
-        float currentVelocity = currentMoving.magnitude;
-        float targetVelocity = CalculateTargetVelocity();
-
-
-        currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * _move.magnitude, Time.deltaTime * 10);
-        Vector3 inputDirection = new Vector3(_move.x, 0, _move.y).normalized;
-        Vector3 newDirection = transform.TransformDirection(inputDirection);
-        _characterController.Move(newDirection * currentVelocity * Time.deltaTime +
-                                  Vector3.up * _verticalVelocity * Time.deltaTime);
-    }
-
-    private void CheckSprinting()
-    {
-        if (_move.y < 0)
-            _isSprinting = false;
-        if (_currentStance is PlayerSettings.PlayerStance.Prone)
-            _isSprinting = false;
-    }
-
-    private float CalculateTargetVelocity()
-    {
-        float targetVelocity = 0f;
-
-        if (_move != Vector2.zero)
+        [Inject]
+        private void Construct(IInputService input)
         {
-            if (math.abs(_move.x) > 0)
-                targetVelocity = playerSettings.forwardSpeed * playerSettings.sidewaysSpeedMultiplier;
+            _input = input;
+
+            Subscribe();
+        }
+
+        private void Subscribe()
+        {
+            _inputActions = new InputActions();
+            _inputActions.Enable();
+
+            _input.StartSprinting += () => IsSprinting = true;
+            _input.FinishSprinting += () => IsSprinting = false;
+            _input.Jump += Jump;
+            _input.Crouch += ToggleCrouch;
+            _input.Prone += ToggleProne;
+
+            _input.StartAiming += () => IsAiming = true;
+            _input.FinishAiming += () => IsAiming = false;
+            _input.Fire += Fire;
+        
+            _characterController = GetComponent<CharacterController>();
+        }
+
+        private void FixedUpdate()
+        {
+            Move();
+            CheckGround();
+            CalculateVerticalVelocity();
+        }
+
+        private void Update()
+        {
+            CalculateStance();
+        }
+
+        private void LateUpdate()
+        {
+            Look();
+        }
+
+        private void Look()
+        {
+            Vector2 look = _input.GetLook();
             
-            if (_move.y > 0)
+            float sensX = playerSettings.mouseSensitivityX;
+            float sensY = playerSettings.mouseSensitivityY;
+
+            if (IsAiming)
             {
-                if(_isSprinting)
-                    targetVelocity = playerSettings.sprintSpeed;
-                else 
-                    targetVelocity = playerSettings.forwardSpeed;
-
-                if (math.abs(_move.x) > 0)
-                    targetVelocity *= playerSettings.sidewaysSpeedMultiplier;
+                sensX *= playerSettings.aimingMouseSensitivityModifier;
+                sensY *= playerSettings.aimingMouseSensitivityModifier;
             }
-            else if (_move.y < 0)
-                targetVelocity = playerSettings.forwardSpeed * playerSettings.backwardSpeedMultiplier;
+        
+            _horizontalRotation = look.x * sensX * Time.deltaTime *
+                                  (playerSettings.mouseInvertedX ? 1 : -1);
+            _verticalRotation += look.y * sensY * Time.deltaTime *
+                                 (playerSettings.mouseInvertedY ? 1 : -1);
 
+            float recoilSmooth = currentWeapon ? currentWeapon.recoil.recoilSmooth : 1;
+            _recoil = Vector2.Lerp(_recoil, Vector2.zero, Time.deltaTime * recoilSmooth);
 
-            if (_currentStance is PlayerSettings.PlayerStance.Crouch)
-                targetVelocity *= playerSettings.crouchSpeedMultiplier;
-            if (_currentStance is PlayerSettings.PlayerStance.Prone)
-                targetVelocity *= playerSettings.proneSpeedMultiplier;
+            _horizontalRotation += _recoil.x;
+            _verticalRotation -= _recoil.y;
+        
+            _verticalRotation = Mathf.Clamp(_verticalRotation, playerSettings.bottomClamp, playerSettings.topClamp);
+
+            fpsCameraTransform.localRotation = Quaternion.Euler(_verticalRotation, 0, 0);
+            transform.Rotate(Vector3.up, _horizontalRotation);
+
         }
 
-        return targetVelocity;
-    }
-    
-    private void CalculateVerticalVelocity()
-    {
-        if(_isGrounded)
-            return;
-
-        if(math.abs(_verticalVelocity)< terminalVerticalVelocity)
-            _verticalVelocity -= playerSettings.gravityValue * Time.deltaTime;
-    }
-
-    private void CalculateStance()
-    {
-        float targetHeight = playerSettings.GetStanceHeight(_currentStance);
-        Vector3 targetCenter = playerSettings.GetStanceCenter(_currentStance);
-        Vector3 targetCameraPos = playerSettings.GetStanceCameraPos(_currentStance);
-
-        float currentHeight = _characterController.height;
-        Vector3 currentCenter = _characterController.center;
-        Vector3 currentCameraPos = fpsCameraTransform.localPosition;
-
-        if(Math.Abs(currentHeight - targetHeight) < .01)
-            return;
-        
-        currentHeight = Mathf.Lerp(currentHeight, targetHeight, Time.deltaTime * playerSettings.stanceTransitionSmooth);
-        currentCenter = Vector3.Lerp(currentCenter, targetCenter, Time.deltaTime * playerSettings.stanceTransitionSmooth);
-        currentCameraPos = Vector3.Lerp(currentCameraPos, targetCameraPos,
-            Time.deltaTime * playerSettings.stanceTransitionSmooth);
-        
-        _characterController.height = currentHeight;
-        _characterController.center = currentCenter;
-        fpsCameraTransform.localPosition = currentCameraPos;
-    }
-    
-    private void Jump()
-    {
-        if(CheckObstaclesOverhead())
-            return;
-        
-        if(_currentStance is PlayerSettings.PlayerStance.Prone)
-            return;
-        if (_currentStance is PlayerSettings.PlayerStance.Crouch)
-            _currentStance = PlayerSettings.PlayerStance.Normal;
-        
-        if(_isGrounded is false)
-            return;
-        
-        _verticalVelocity = Mathf.Sqrt(playerSettings.jumpingHeight * 2f * playerSettings.gravityValue);
-    }
-
-    private void ToggleCrouch()
-    {
-        if (_currentStance is PlayerSettings.PlayerStance.Crouch)
+        private void Move()
         {
-            if (CheckObstaclesOverhead())
-                return;
-
-            _currentStance = PlayerSettings.PlayerStance.Normal;
-            return;
-        }
-
-        if (_currentStance is PlayerSettings.PlayerStance.Prone)
-        {
-            if (CheckObstaclesOverhead())
-                return;
+            Vector2 move = _input.GetMove();
             
-            _currentStance = PlayerSettings.PlayerStance.Crouch;
-            return;
-        }
-        
-        _currentStance = PlayerSettings.PlayerStance.Crouch;
-    }
+            CheckSprinting(move);
 
-    private void ToggleProne()
-    {
-        if (_currentStance is PlayerSettings.PlayerStance.Normal ||
-            _currentStance is PlayerSettings.PlayerStance.Crouch)
-            _currentStance = PlayerSettings.PlayerStance.Prone;
-        else
+            Vector3 currentMoving = _characterController.velocity;
+            currentMoving.y = 0;
+            
+            float currentVelocity = currentMoving.magnitude;
+            float targetVelocity = CalculateTargetVelocity(move);
+
+            currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * move.magnitude, Time.deltaTime * 10f);
+            Vector3 inputDirection = new Vector3(move.x, 0, move.y).normalized;
+            Vector3 newDirection = transform.TransformDirection(inputDirection);
+            _characterController.Move(newDirection * currentVelocity * Time.deltaTime +
+                                      Vector3.up * _verticalVelocity * Time.deltaTime);
+        }
+
+        private void CheckGround()
+        {
+            bool newGrounded = _characterController.isGrounded;
+        
+            if(_verticalVelocity < 0 && newGrounded is false)
+                PlayerFalling?.Invoke();
+
+            if(IsGrounded is false && newGrounded)
+                PlayerLands?.Invoke();
+        
+            IsGrounded = newGrounded;
+        }
+
+        private void CheckSprinting(Vector2 move)
+        {
+            if (move.y < 0 ||
+                IsProneStance||
+                IsAiming)
+                IsSprinting = false;
+        }
+
+        private float CalculateTargetVelocity(Vector2 move)
+        {
+            float targetVelocity = 0f;
+
+            if (move != Vector2.zero)
+            {
+                if (math.abs(move.x) > 0)
+                    targetVelocity = playerSettings.forwardSpeed * playerSettings.sidewaysSpeedModifier;
+            
+                if (move.y > 0)
+                {
+                    if(IsSprinting)
+                        targetVelocity = playerSettings.sprintSpeed;
+                    else 
+                        targetVelocity = playerSettings.forwardSpeed;
+
+                    if (math.abs(move.x) > 0)
+                        targetVelocity *= playerSettings.sidewaysSpeedModifier;
+                }
+                else if (move.y < 0)
+                    targetVelocity = playerSettings.forwardSpeed * playerSettings.backwardSpeedModifier;
+
+
+                if (IsCrouchStance)
+                    targetVelocity *= playerSettings.crouchSpeedModifier;
+                if (IsProneStance)
+                    targetVelocity *= playerSettings.proneSpeedModifier;
+            }
+
+            if (IsAiming)
+            {
+                if (IsProneStance)
+                    targetVelocity = 0;
+                else
+                    targetVelocity *= playerSettings.aimingSpeedModifier;
+            }
+        
+            return targetVelocity;
+        }
+
+        private void CalculateVerticalVelocity()
+        {
+            if(IsGrounded)
+                return;
+
+            if(math.abs(_verticalVelocity)< terminalVerticalVelocity)
+                _verticalVelocity -= playerSettings.gravityValue * Time.fixedDeltaTime;
+        }
+
+        private void CalculateStance()
+        {
+            float targetHeight = playerSettings.GetStanceHeight(_currentStance);
+            Vector3 targetCenter = playerSettings.GetStanceCenter(_currentStance);
+            Vector3 targetCameraPos = playerSettings.GetStanceCameraPos(_currentStance);
+
+            float currentHeight = _characterController.height;
+            Vector3 currentCenter = _characterController.center;
+            Vector3 currentCameraPos = fpsCameraTransform.localPosition;
+
+            if(Math.Abs(currentHeight - targetHeight) < .01)
+                return;
+        
+            currentHeight = Mathf.Lerp(currentHeight, targetHeight, Time.deltaTime * playerSettings.stanceTransitionSmooth);
+            currentCenter = Vector3.Lerp(currentCenter, targetCenter, Time.deltaTime * playerSettings.stanceTransitionSmooth);
+            currentCameraPos = Vector3.Lerp(currentCameraPos, targetCameraPos,
+                Time.deltaTime * playerSettings.stanceTransitionSmooth);
+        
+            _characterController.height = currentHeight;
+            _characterController.center = currentCenter;
+            fpsCameraTransform.localPosition = currentCameraPos;
+        }
+
+        private void Jump()
         {
             if(CheckObstaclesOverhead())
                 return;
-            
-            _currentStance = PlayerSettings.PlayerStance.Crouch;
+        
+            if(IsProneStance)
+                return;
+            if (IsCrouchStance)
+                SetNormalStance();
+        
+            if(IsGrounded is false)
+                return;
+        
+            _verticalVelocity = Mathf.Sqrt(playerSettings.jumpingHeight * 2f * playerSettings.gravityValue);
+            PlayerJump?.Invoke();
         }
-    }
 
-    private bool CheckObstaclesOverhead()
-    {
-        return Physics.CheckSphere(fpsCameraTransform.position, checkSphereRadius, ObstaclesLayerMask, QueryTriggerInteraction.Ignore);
-    }
+        private void ToggleCrouch()
+        {
+            if (IsCrouchStance)
+            {
+                if (CheckObstaclesOverhead())
+                    return;
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawSphere(fpsCameraTransform.position, checkSphereRadius);
+                SetNormalStance();
+                return;
+            }
+
+            if (IsProneStance)
+            {
+                if (CheckObstaclesOverhead())
+                    return;
+            
+                SetCrouchStance();
+                return;
+            }
+        
+            SetCrouchStance();
+        }
+
+        private void ToggleProne()
+        {
+            if (IsStand || IsCrouchStance)
+                SetProneStance();
+            else
+            {
+                if(CheckObstaclesOverhead())
+                    return;
+            
+                SetCrouchStance();
+            }
+        }
+
+        private void SetProneStance() => 
+            _currentStance = PlayerSettings.PlayerStance.Prone;
+
+        private void SetNormalStance() => 
+            _currentStance = PlayerSettings.PlayerStance.Normal;
+
+        private void SetCrouchStance() => 
+            _currentStance = PlayerSettings.PlayerStance.Crouch;
+
+        private bool CheckObstaclesOverhead() => 
+            Physics.CheckSphere(fpsCameraTransform.position, checkSphereRadius, obstaclesLayerMask, QueryTriggerInteraction.Ignore);
+
+        private void OnDrawGizmos()
+        {
+            //Gizmos.DrawSphere(fpsCameraTransform.position, checkSphereRadius);
+        }
+
+        private void Fire()
+        {
+            if (currentWeapon is null)
+                return;
+
+            _recoil = currentWeapon.recoil.GetRecoilAmount();
+        }
     }
 }
