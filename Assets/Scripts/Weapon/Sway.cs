@@ -21,13 +21,6 @@ namespace Weapon
         {
             _player = player;
             _input = input;
-            
-            Subscribe();
-        }
-
-        private void Subscribe()
-        {
-            
         }
 
         private void Start()
@@ -44,8 +37,10 @@ namespace Weapon
 
         private void CalculateSway()
         {
-            transform.localRotation = Quaternion.Lerp(transform.localRotation,
-                transform.localRotation * _targetRotation, Time.fixedDeltaTime * settings.swaySmooth);
+            var localRotation = transform.localRotation;
+            localRotation = Quaternion.Lerp(localRotation,
+                localRotation * _targetRotation, Time.fixedDeltaTime * settings.swaySmooth);
+            transform.localRotation = localRotation;
         }
 
         private void SetSway()
@@ -57,8 +52,8 @@ namespace Weapon
 
             if (_player.IsAiming)
             {
-                swayIntensityX *= settings.aimingSwayIntensityModifier;
-                swayIntensityY *= settings.aimingSwayIntensityModifier;
+                swayIntensityX *= AimingSwayIntensityModifier();
+                swayIntensityY *= AimingSwayIntensityModifier();
             }
         
             Quaternion rotationX =
@@ -72,9 +67,6 @@ namespace Weapon
             rotationY.x = Math.Clamp(rotationY.x, -settings.swayClampY, settings.swayClampY);
 
             _targetRotation = rotationX * rotationY;
-
-            //transform.localRotation =
-            //    Quaternion.Lerp(transform.localRotation, targetRotation, Time.deltaTime * settings.swaySmooth);
         }
 
         private void CalculateMovementSway()
@@ -91,7 +83,9 @@ namespace Weapon
 
             transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, 
                     Time.fixedDeltaTime * settings.movementSwaySmooth);
-        
         }
+
+        private float AimingSwayIntensityModifier() => 
+            settings.aimingSwayIntensityModifier;
     }
 }

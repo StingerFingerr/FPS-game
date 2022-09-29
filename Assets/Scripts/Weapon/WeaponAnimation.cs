@@ -1,5 +1,4 @@
-﻿using System;
-using Character;
+﻿using Character;
 using Services.Input;
 using UnityEngine;
 using Zenject;
@@ -8,11 +7,18 @@ namespace Weapon
 {
     public class WeaponAnimation: MonoBehaviour
     {
+        private static readonly int IsIdle = Animator.StringToHash("isIdle");
+        private static readonly int IsSprinting = Animator.StringToHash("isSprinting");
+        private static readonly int IsJumping = Animator.StringToHash("isJumping");
+        private static readonly int IsFalling = Animator.StringToHash("isFalling");
+        private static readonly int IsLanding = Animator.StringToHash("isLanding");
+
         public Animator animator;
         
         private CharacterControllerScript _player;
         private IInputService _input;
         private bool _isFalling;
+        private bool _isAiming;
 
         [Inject]
         private void Construct(CharacterControllerScript player ,IInputService input)
@@ -28,49 +34,51 @@ namespace Weapon
             _player.PlayerJump += SetJumpingAnimation;
             _player.PlayerLands += SetLandingAnimation;
             _player.PlayerFalling += SetFallingAnimation;
+
+            _input.StartAiming += StartAiming;
+            _input.FinishAiming += FinishAiming;
         }
 
 
         private void Update()
         {
+            UpdateAiming();
             SetIdleAnimation();
             SetSprintingAnimation();
         }
 
-        private void SetAnimations()
+        private void StartAiming()
         {
-            //if (_isJumping)
-            //    return;
-//
-            //if (isAiming)
-            //{
-            //    animator.speed = 0;
-            //    if(animator.speed < .05f)
-            //        animator.enabled = false;  
-            //
-            //    animator.transform.localPosition =
-            //        Vector3.Lerp(animator.transform.localPosition, Vector3.zero, Time.deltaTime * settings.aimingTime);
-            //    animator.transform.localRotation = Quaternion.Lerp(animator.transform.localRotation,
-            //        Quaternion.Euler(0f, 0f, 0f), Time.deltaTime * settings.aimingTime);
-            //    return;
-            //}
-//
+            _isAiming = true;
+            animator.enabled = false;
         }
 
-        private void SetIdleAnimation()
+        private void FinishAiming()
         {
-            animator.SetBool("isIdle", _input.GetMove() == Vector2.zero);
+            _isAiming = false;
+            animator.enabled = true;
+            
+            animator.Rebind();
         }
 
-        private void SetSprintingAnimation()
+        private void UpdateAiming()
         {
-            animator.SetBool("isSprinting", _player.IsSprinting);
+            if(_isAiming)
+            {
+                float aimingSpeed = Time.deltaTime * 10f;
+                transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero, aimingSpeed);
+                transform.localRotation = Quaternion.Lerp(transform.localRotation, Quaternion.Euler(Vector3.zero), aimingSpeed);
+            }
         }
 
-        private void SetJumpingAnimation()
-        {
-            animator.SetTrigger("isJumping");
-        }
+        private void SetIdleAnimation() => 
+            animator.SetBool(IsIdle, _input.GetMove() == Vector2.zero);
+
+        private void SetSprintingAnimation() => 
+            animator.SetBool(IsSprinting, _player.IsSprinting);
+
+        private void SetJumpingAnimation() => 
+            animator.SetTrigger(IsJumping);
 
         private void SetFallingAnimation()
         {
@@ -78,13 +86,13 @@ namespace Weapon
                 return;
             
             _isFalling = true;
-            animator.SetTrigger("isFalling");
+            animator.SetTrigger(IsFalling);
         }
     
         private void SetLandingAnimation()
         {
             _isFalling = false;
-            animator.SetTrigger("isLanding");
+            animator.SetTrigger(IsLanding);
         }
 
     }
