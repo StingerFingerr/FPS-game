@@ -52,8 +52,8 @@ namespace Weapon
             Vector2 recoil = Vector2.zero;
             recoil.x = Random.Range(-recoilAmountX, recoilAmountX);
             recoil.y = Random.Range(recoilMinAmountY, recoilMaxAmountY);
-            if (_player.IsAiming)
-                recoil *= aimingRecoilAmountModifier;
+
+            recoil *= AimingRecoilModifier();
 
             return recoil;
         }

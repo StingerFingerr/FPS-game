@@ -12,22 +12,14 @@ namespace Weapon
         public Vector3 aimPosition;
         public Recoil recoil;
 
-        private IInputService _input;
         private CharacterControllerScript _player;
         
         [Inject]
-        private void Construct(CharacterControllerScript player, IInputService input)
+        private void Construct(CharacterControllerScript player)
         {
             _player = player;
-            _input = input;
-            
-            Subscribe();
         }
 
-        private void Subscribe()
-        {
-            _input.Fire += Fire;
-        }
         
         private void Update()
         {
@@ -40,11 +32,6 @@ namespace Weapon
                 transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition, Time.deltaTime * settings.aimingTime);
             else
                 transform.localPosition = Vector3.Lerp(transform.localPosition, hipPosition, Time.deltaTime * settings.aimingTime);
-        }
-
-        private void Fire()
-        {
-
         }
     }
 }

@@ -14,13 +14,12 @@ namespace Services.Input
         event Action StartSprinting;
         event Action FinishSprinting;
         
-        event Action<Vector2> Look;
-
         event Action Jump;
 
         event Action Crouch;
         event Action Prone;
 
         Vector2 GetMove();
+        Vector2 GetLook();
     }
 }

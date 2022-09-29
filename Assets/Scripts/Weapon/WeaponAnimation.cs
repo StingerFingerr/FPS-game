@@ -7,79 +7,93 @@ namespace Weapon
 {
     public class WeaponAnimation: MonoBehaviour
     {
+        private static readonly int IsIdle = Animator.StringToHash("isIdle");
+        private static readonly int IsSprinting = Animator.StringToHash("isSprinting");
+        private static readonly int IsJumping = Animator.StringToHash("isJumping");
+        private static readonly int IsFalling = Animator.StringToHash("isFalling");
+        private static readonly int IsLanding = Animator.StringToHash("isLanding");
+
         public Animator animator;
         
         private CharacterControllerScript _player;
         private IInputService _input;
+        private bool _isFalling;
+        private bool _isAiming;
 
         [Inject]
         private void Construct(CharacterControllerScript player ,IInputService input)
         {
             _player = player;
             _input = input;
-        }
-        
-        
-        
-        /*private void SetAnimations()
-        {
-            if (_isJumping)
-                return;
 
-            if (isAiming)
-            {
-                animator.speed = 0;
-                if(animator.speed < .05f)
-                    animator.enabled = false;  
-            
-                animator.transform.localPosition =
-                    Vector3.Lerp(animator.transform.localPosition, Vector3.zero, Time.deltaTime * settings.aimingTime);
-                animator.transform.localRotation = Quaternion.Lerp(animator.transform.localRotation,
-                    Quaternion.Euler(0f, 0f, 0f), Time.deltaTime * settings.aimingTime);
-                return;
-            }
-        
+            Subscribe();
+        }
+
+        private void Subscribe()
+        {
+            _player.PlayerJump += SetJumpingAnimation;
+            _player.PlayerLands += SetLandingAnimation;
+            _player.PlayerFalling += SetFallingAnimation;
+
+            _input.StartAiming += StartAiming;
+            _input.FinishAiming += FinishAiming;
+        }
+
+
+        private void Update()
+        {
+            UpdateAiming();
+            SetIdleAnimation();
+            SetSprintingAnimation();
+        }
+
+        private void StartAiming()
+        {
+            _isAiming = true;
+            animator.enabled = false;
+        }
+
+        private void FinishAiming()
+        {
+            _isAiming = false;
             animator.enabled = true;
-        
-            if (_playerMove == Vector2.zero)
-            {
-                animator.speed = 1;
-                animator.SetBool("isIdle", true);
-                return;
-            }
-
-            animator.SetBool("isIdle", false);
-            animator.SetBool("isSprinting", _isSprinting);
-            animator.speed = Mathf.Lerp(animator.speed, _characterVelocity, Time.deltaTime * 10f);
+            
+            animator.Rebind();
         }
 
-        private void SetJumpingAnimation()
+        private void UpdateAiming()
         {
-            _isJumping = true;
-
-            animator.speed = 1;
-            animator.SetTrigger("isJumping");
+            if(_isAiming)
+            {
+                float aimingSpeed = Time.deltaTime * 10f;
+                transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero, aimingSpeed);
+                transform.localRotation = Quaternion.Lerp(transform.localRotation, Quaternion.Euler(Vector3.zero), aimingSpeed);
+            }
         }
+
+        private void SetIdleAnimation() => 
+            animator.SetBool(IsIdle, _input.GetMove() == Vector2.zero);
+
+        private void SetSprintingAnimation() => 
+            animator.SetBool(IsSprinting, _player.IsSprinting);
+
+        private void SetJumpingAnimation() => 
+            animator.SetTrigger(IsJumping);
 
         private void SetFallingAnimation()
         {
             if(_isFalling)
                 return;
-
+            
             _isFalling = true;
-
-            animator.speed = 1;
-            animator.SetTrigger("isFalling");
+            animator.SetTrigger(IsFalling);
         }
     
         private void SetLandingAnimation()
         {
-            _isJumping = false;
             _isFalling = false;
-            animator.speed = 1;
-
-            animator.SetTrigger("isLanding");
-        }*/
+            animator.SetTrigger(IsLanding);
+        }
 
     }
 }
