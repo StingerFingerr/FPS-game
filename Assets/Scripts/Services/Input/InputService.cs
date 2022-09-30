@@ -5,7 +5,9 @@ namespace Services.Input
 {
     public class InputService: MonoBehaviour, IInputService
     {
-        public event Action Fire;
+        public event Action StartFiring;
+        public event Action FinishFiring;
+        public event Action SwitchFiringMode;
         public event Action StartAiming;
         public event Action FinishAiming;
         public event Action StartSprinting;
@@ -33,7 +35,9 @@ namespace Services.Input
             
             _inputActions.Weapon.Aim.performed += e => StartAiming?.Invoke();
             _inputActions.Weapon.Aim.canceled += e => FinishAiming?.Invoke();
-            _inputActions.Weapon.Fire.performed += e=>Fire?.Invoke();
+            _inputActions.Weapon.Fire.performed += e => StartFiring?.Invoke();
+            _inputActions.Weapon.Fire.canceled += e => FinishFiring?.Invoke();
+            _inputActions.Weapon.SwitchFiringMode.performed += e => SwitchFiringMode?.Invoke();
 
             _inputActions.Enable();
         }

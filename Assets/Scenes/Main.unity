@@ -24,7 +24,7 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 4
+  m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
@@ -1106,6 +1106,9 @@ GameObject:
   - component: {fileID: 521716805}
   - component: {fileID: 521716807}
   - component: {fileID: 521716806}
+  - component: {fileID: 521716808}
+  - component: {fileID: 521716809}
+  - component: {fileID: 521716810}
   m_Layer: 7
   m_Name: M4
   m_TagString: Untagged
@@ -1145,6 +1148,11 @@ MonoBehaviour:
   hipPosition: {x: 0.2, y: -0.2, z: 0.3}
   aimPosition: {x: 0, y: -0.164, z: 0.2}
   recoil: {fileID: 521716807}
+  firingModes:
+  - {fileID: 521716808}
+  - {fileID: 521716809}
+  - {fileID: 521716810}
+  firingModeIndex: 0
 --- !u!114 &521716806
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1177,6 +1185,47 @@ MonoBehaviour:
   recoilPositionOffset: {x: 0, y: 0, z: -0.1}
   recoilRotationOffset: {x: -0.1, y: 0, z: 0}
   aimingRecoilAmountModifier: 0.5
+  weapon: {fileID: 521716805}
+--- !u!114 &521716808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 521716803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab4c8dd25fb8414aa2e6076447d61f7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delayBetweenShots: 0.1
+--- !u!114 &521716809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 521716803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d06d26cb6364379b967077f4afdd7c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  burstSize: 2
+  delayBetweenShots: 0.15
+--- !u!114 &521716810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 521716803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b926ba3601424e80b3a1e0bee3cb6998, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firingRate: 0.1
 --- !u!1 &526290402
 GameObject:
   m_ObjectHideFlags: 0
@@ -1647,6 +1696,7 @@ MonoBehaviour:
   fpsCameraTransform: {fileID: 390431100}
   playerSettings: {fileID: 11400000, guid: 128a2c7ee63e72c47988e9c79358c8e4, type: 2}
   terminalVerticalVelocity: 10
+  characterController: {fileID: 889626139}
   currentWeapon: {fileID: 521716805}
 --- !u!1 &1096820927
 GameObject:

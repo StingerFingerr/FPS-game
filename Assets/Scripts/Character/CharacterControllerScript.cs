@@ -13,6 +13,7 @@ namespace Character
         public Transform fpsCameraTransform;
         public PlayerSettings playerSettings;
         public float terminalVerticalVelocity = 10;
+        public CharacterController characterController;
 
         public event Action PlayerJump;
         public event Action PlayerFalling;
@@ -22,8 +23,7 @@ namespace Character
         public bool IsAiming { get; private set; }
 
         private IInputService _input;
-        private InputActions _inputActions;
-        private CharacterController _characterController;
+
 
         private float _verticalVelocity;
 
@@ -47,9 +47,6 @@ namespace Character
 
         private void Subscribe()
         {
-            _inputActions = new InputActions();
-            _inputActions.Enable();
-
             _input.StartSprinting += () => IsSprinting = true;
             _input.FinishSprinting += () => IsSprinting = false;
             _input.Jump += Jump;
@@ -58,9 +55,8 @@ namespace Character
 
             _input.StartAiming += () => IsAiming = true;
             _input.FinishAiming += () => IsAiming = false;
-            _input.Fire += Fire;
-        
-            _characterController = GetComponent<CharacterController>();
+
+            currentWeapon.OnShot += SetRecoil;
         }
 
         private void FixedUpdate()
@@ -117,7 +113,7 @@ namespace Character
             
             CheckSprinting(move);
 
-            Vector3 currentMoving = _characterController.velocity;
+            Vector3 currentMoving = characterController.velocity;
             currentMoving.y = 0;
             
             float currentVelocity = currentMoving.magnitude;
@@ -126,13 +122,13 @@ namespace Character
             currentVelocity = Mathf.Lerp(currentVelocity, targetVelocity * move.magnitude, Time.deltaTime * 10f);
             Vector3 inputDirection = new Vector3(move.x, 0, move.y).normalized;
             Vector3 newDirection = transform.TransformDirection(inputDirection);
-            _characterController.Move(newDirection * currentVelocity * Time.deltaTime +
+            characterController.Move(newDirection * currentVelocity * Time.deltaTime +
                                       Vector3.up * _verticalVelocity * Time.deltaTime);
         }
 
         private void CheckGround()
         {
-            bool newGrounded = _characterController.isGrounded;
+            bool newGrounded = characterController.isGrounded;
         
             if(_verticalVelocity < 0 && newGrounded is false)
                 PlayerFalling?.Invoke();
@@ -206,8 +202,8 @@ namespace Character
             Vector3 targetCenter = playerSettings.GetStanceCenter(_currentStance);
             Vector3 targetCameraPos = playerSettings.GetStanceCameraPos(_currentStance);
 
-            float currentHeight = _characterController.height;
-            Vector3 currentCenter = _characterController.center;
+            float currentHeight = characterController.height;
+            Vector3 currentCenter = characterController.center;
             Vector3 currentCameraPos = fpsCameraTransform.localPosition;
 
             if(Math.Abs(currentHeight - targetHeight) < .01)
@@ -218,8 +214,8 @@ namespace Character
             currentCameraPos = Vector3.Lerp(currentCameraPos, targetCameraPos,
                 Time.deltaTime * playerSettings.stanceTransitionSmooth);
         
-            _characterController.height = currentHeight;
-            _characterController.center = currentCenter;
+            characterController.height = currentHeight;
+            characterController.center = currentCenter;
             fpsCameraTransform.localPosition = currentCameraPos;
         }
 
@@ -293,12 +289,7 @@ namespace Character
             //Gizmos.DrawSphere(fpsCameraTransform.position, checkSphereRadius);
         }
 
-        private void Fire()
-        {
-            if (currentWeapon is null)
-                return;
-
+        private void SetRecoil() => 
             _recoil = currentWeapon.recoil.GetRecoilAmount();
-        }
     }
 }
