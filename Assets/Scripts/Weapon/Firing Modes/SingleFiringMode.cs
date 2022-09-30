@@ -12,7 +12,7 @@ namespace Weapon.Firing_Modes
         private IInputService _input;
         
         private float _nextShotTimer;
-        private bool _nextShotAvailable;
+        private bool _nextShotAvailable = true;
 
         [Inject]
         private void Construct(IInputService input)
