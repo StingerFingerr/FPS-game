@@ -1108,6 +1108,7 @@ GameObject:
   - component: {fileID: 521716806}
   - component: {fileID: 521716808}
   - component: {fileID: 521716809}
+  - component: {fileID: 521716810}
   m_Layer: 7
   m_Name: M4
   m_TagString: Untagged
@@ -1150,7 +1151,8 @@ MonoBehaviour:
   firingModes:
   - {fileID: 521716808}
   - {fileID: 521716809}
-  firingModeIndex: 1
+  - {fileID: 521716810}
+  firingModeIndex: 2
 --- !u!114 &521716806
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1211,6 +1213,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   burstSize: 2
   delayBetweenShots: 0.15
+--- !u!114 &521716810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 521716803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b926ba3601424e80b3a1e0bee3cb6998, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firingRate: 0.1
 --- !u!1 &526290402
 GameObject:
   m_ObjectHideFlags: 0
