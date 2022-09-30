@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
 using Character;
 using Services.Input;
 using UnityEngine;
+using Weapon.Firing_Modes;
 using Zenject;
 
 namespace Weapon
@@ -11,20 +14,42 @@ namespace Weapon
         public Vector3 hipPosition;
         public Vector3 aimPosition;
         public Recoil recoil;
+        public BaseFiringMode[] firingModes;
 
-        private CharacterControllerScript _player;
+        public event Action OnShot;
         
+        private CharacterControllerScript _player;
+        private IInputService _input;
+
+        private int _firingModeIndex = 0;
+        private bool _isFiring;
+
+
         [Inject]
-        private void Construct(CharacterControllerScript player)
+        private void Construct(CharacterControllerScript player, IInputService input)
         {
             _player = player;
+            _input = input;
+
+            Subscribe();
         }
 
+        private void Subscribe()
+        {
+            _input.StartFiring += () => _isFiring = true;
+            _input.FinishFiring += () => _isFiring = false;
+        }
         
         private void Update()
         {
+            if(_isFiring)
+                Fire();
+            
             CalculateAiming();
         }
+
+        public void Fire() => 
+            firingModes[_firingModeIndex].TryShoot(OnShot);
 
         private void CalculateAiming()
         {

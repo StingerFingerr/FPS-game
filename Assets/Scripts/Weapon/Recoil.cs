@@ -16,12 +16,14 @@ namespace Weapon
         public Vector3 recoilPositionOffset;
         public Vector3 recoilRotationOffset;
         public float aimingRecoilAmountModifier;
-        private Vector3 _recoilPosOffset;
-        private Vector3 _recoilRotOffset;
+        public Weapon weapon;
 
         private CharacterControllerScript _player;
         private IInputService _input;
-    
+        
+        private Vector3 _recoilPosOffset;
+        private Vector3 _recoilRotOffset;
+
         [Inject]
         private void Construct(CharacterControllerScript player, IInputService input)
         {
@@ -33,7 +35,7 @@ namespace Weapon
 
         private void Subscribe()
         {
-            _input.Fire += SetRecoilAmount;
+            weapon.OnShot += SetRecoilAmount;
         }
     
         private void FixedUpdate()
