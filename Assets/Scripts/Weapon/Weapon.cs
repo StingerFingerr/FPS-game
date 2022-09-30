@@ -21,7 +21,7 @@ namespace Weapon
         private CharacterControllerScript _player;
         private IInputService _input;
 
-        private int _firingModeIndex = 0;
+        public int firingModeIndex = 0;
         private bool _isFiring;
 
 
@@ -49,7 +49,7 @@ namespace Weapon
         }
 
         public void Fire() => 
-            firingModes[_firingModeIndex].TryShoot(OnShot);
+            firingModes[firingModeIndex].TryShoot(OnShot);
 
         private void CalculateAiming()
         {
