@@ -227,6 +227,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SwitchFiringMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""73e19754-6b01-4ec4-adbe-167617796048"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -262,6 +271,17 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bb0c9174-d654-443a-bbb0-eb2c0524f4be"",
+                    ""path"": ""<Keyboard>/b"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SwitchFiringMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -280,6 +300,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_Weapon = asset.FindActionMap("Weapon", throwIfNotFound: true);
         m_Weapon_Aim = m_Weapon.FindAction("Aim", throwIfNotFound: true);
         m_Weapon_Fire = m_Weapon.FindAction("Fire", throwIfNotFound: true);
+        m_Weapon_SwitchFiringMode = m_Weapon.FindAction("SwitchFiringMode", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -414,12 +435,14 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private IWeaponActions m_WeaponActionsCallbackInterface;
     private readonly InputAction m_Weapon_Aim;
     private readonly InputAction m_Weapon_Fire;
+    private readonly InputAction m_Weapon_SwitchFiringMode;
     public struct WeaponActions
     {
         private @InputActions m_Wrapper;
         public WeaponActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Aim => m_Wrapper.m_Weapon_Aim;
         public InputAction @Fire => m_Wrapper.m_Weapon_Fire;
+        public InputAction @SwitchFiringMode => m_Wrapper.m_Weapon_SwitchFiringMode;
         public InputActionMap Get() { return m_Wrapper.m_Weapon; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -435,6 +458,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Fire.started -= m_Wrapper.m_WeaponActionsCallbackInterface.OnFire;
                 @Fire.performed -= m_Wrapper.m_WeaponActionsCallbackInterface.OnFire;
                 @Fire.canceled -= m_Wrapper.m_WeaponActionsCallbackInterface.OnFire;
+                @SwitchFiringMode.started -= m_Wrapper.m_WeaponActionsCallbackInterface.OnSwitchFiringMode;
+                @SwitchFiringMode.performed -= m_Wrapper.m_WeaponActionsCallbackInterface.OnSwitchFiringMode;
+                @SwitchFiringMode.canceled -= m_Wrapper.m_WeaponActionsCallbackInterface.OnSwitchFiringMode;
             }
             m_Wrapper.m_WeaponActionsCallbackInterface = instance;
             if (instance != null)
@@ -445,6 +471,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Fire.started += instance.OnFire;
                 @Fire.performed += instance.OnFire;
                 @Fire.canceled += instance.OnFire;
+                @SwitchFiringMode.started += instance.OnSwitchFiringMode;
+                @SwitchFiringMode.performed += instance.OnSwitchFiringMode;
+                @SwitchFiringMode.canceled += instance.OnSwitchFiringMode;
             }
         }
     }
@@ -462,5 +491,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     {
         void OnAim(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
+        void OnSwitchFiringMode(InputAction.CallbackContext context);
     }
 }

@@ -1152,7 +1152,7 @@ MonoBehaviour:
   - {fileID: 521716808}
   - {fileID: 521716809}
   - {fileID: 521716810}
-  firingModeIndex: 2
+  firingModeIndex: 0
 --- !u!114 &521716806
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -38,6 +38,7 @@ namespace Weapon
         {
             _input.StartFiring += () => _isFiring = true;
             _input.FinishFiring += () => _isFiring = false;
+            _input.SwitchFiringMode += SwitchFiringMode;
         }
         
         private void Update()
@@ -48,6 +49,13 @@ namespace Weapon
             CalculateAiming();
         }
 
+        private void SwitchFiringMode()
+        {
+            firingModeIndex++;
+            if (firingModeIndex > firingModes.Length - 1)
+                firingModeIndex = 0;
+        }
+        
         public void Fire() => 
             firingModes[firingModeIndex].TryShoot(OnShot);
 
