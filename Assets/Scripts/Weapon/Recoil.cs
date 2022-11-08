@@ -18,18 +18,16 @@ namespace Weapon
         public float aimingRecoilAmountModifier;
         public Weapon weapon;
 
-        private CharacterControllerScript _player;
         private IInputService _input;
         
         private Vector3 _recoilPosOffset;
         private Vector3 _recoilRotOffset;
 
         [Inject]
-        private void Construct(CharacterControllerScript player, IInputService input)
+        private void Construct(IInputService input)
         {
-            _player = player;
             _input = input;
-        
+            
             Subscribe();
         }
 
@@ -70,6 +68,6 @@ namespace Weapon
         }
 
         private float AimingRecoilModifier() => 
-            _player.IsAiming ? aimingRecoilAmountModifier : 1;
+            weapon.IsAiming ? aimingRecoilAmountModifier : 1;
     }
 }

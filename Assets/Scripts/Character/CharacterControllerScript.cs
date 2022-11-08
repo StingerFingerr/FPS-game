@@ -20,7 +20,6 @@ namespace Character
         public event Action PlayerLands;
         public bool IsSprinting { get; private set; }
         public bool IsGrounded { get; private set; }
-        public bool IsAiming { get; private set; }
 
         private IInputService _input;
 
@@ -53,8 +52,8 @@ namespace Character
             _input.Crouch += ToggleCrouch;
             _input.Prone += ToggleProne;
 
-            _input.StartAiming += () => IsAiming = true;
-            _input.FinishAiming += () => IsAiming = false;
+            //_input.StartAiming += () => IsAiming = true;
+            //_input.FinishAiming += () => IsAiming = false;
 
             currentWeapon.OnShot += SetRecoil;
         }
@@ -83,7 +82,7 @@ namespace Character
             float sensX = playerSettings.mouseSensitivityX;
             float sensY = playerSettings.mouseSensitivityY;
 
-            if (IsAiming)
+            if (currentWeapon.IsAiming)
             {
                 sensX *= playerSettings.aimingMouseSensitivityModifier;
                 sensY *= playerSettings.aimingMouseSensitivityModifier;
@@ -143,7 +142,8 @@ namespace Character
         {
             if (move.y < 0 ||
                 IsProneStance||
-                IsAiming)
+                currentWeapon.IsAiming||
+                currentWeapon.IsReloading)
                 IsSprinting = false;
         }
 
@@ -176,7 +176,7 @@ namespace Character
                     targetVelocity *= playerSettings.proneSpeedModifier;
             }
 
-            if (IsAiming)
+            if (currentWeapon.IsAiming)
             {
                 if (IsProneStance)
                     targetVelocity = 0;

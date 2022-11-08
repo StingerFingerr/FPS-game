@@ -8,6 +8,7 @@ namespace Services.Input
         public event Action StartFiring;
         public event Action FinishFiring;
         public event Action SwitchFiringMode;
+        public event Action Reloading;
         public event Action StartAiming;
         public event Action FinishAiming;
         public event Action StartSprinting;
@@ -38,6 +39,7 @@ namespace Services.Input
             _inputActions.Weapon.Fire.performed += e => StartFiring?.Invoke();
             _inputActions.Weapon.Fire.canceled += e => FinishFiring?.Invoke();
             _inputActions.Weapon.SwitchFiringMode.performed += e => SwitchFiringMode?.Invoke();
+            _inputActions.Weapon.Reloading.performed += e => Reloading?.Invoke();
 
             _inputActions.Enable();
         }

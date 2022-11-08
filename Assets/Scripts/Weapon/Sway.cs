@@ -8,18 +8,17 @@ namespace Weapon
 {
     public class Sway: MonoBehaviour
     {
+        public Weapon weapon;
         public WeaponSwaySettings settings;
-        
-        private CharacterControllerScript _player;
+
         private IInputService _input;
 
         private Quaternion _originRotation;
         private Quaternion _targetRotation;
 
         [Inject]
-        private void Construct(CharacterControllerScript player, IInputService input)
+        private void Construct(IInputService input)
         {
-            _player = player;
             _input = input;
         }
 
@@ -50,7 +49,7 @@ namespace Weapon
             float swayIntensityX = settings.swayIntensityX;
             float swayIntensityY = settings.swayIntensityY;
 
-            if (_player.IsAiming)
+            if (weapon.IsAiming)
             {
                 swayIntensityX *= AimingSwayIntensityModifier();
                 swayIntensityY *= AimingSwayIntensityModifier();

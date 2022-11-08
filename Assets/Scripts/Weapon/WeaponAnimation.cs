@@ -13,12 +13,14 @@ namespace Weapon
         private static readonly int IsFalling = Animator.StringToHash("isFalling");
         private static readonly int IsLanding = Animator.StringToHash("isLanding");
 
+        public Weapon weapon;
         public Animator animator;
-        
+
         private CharacterControllerScript _player;
         private IInputService _input;
         private bool _isFalling;
         private bool _isAiming;
+        private static readonly int IsReloading = Animator.StringToHash("isReloading");
 
         [Inject]
         private void Construct(CharacterControllerScript player ,IInputService input)
@@ -34,9 +36,12 @@ namespace Weapon
             _player.PlayerJump += SetJumpingAnimation;
             _player.PlayerLands += SetLandingAnimation;
             _player.PlayerFalling += SetFallingAnimation;
-
-            _input.StartAiming += StartAiming;
-            _input.FinishAiming += FinishAiming;
+            
+            weapon.OnStartAiming += StartAiming;
+            weapon.OnFinishAiming += FinishAiming;
+            
+            weapon.OnStartReloading += SetReloadingAnimation;
+            weapon.OnFinishReloading += ResetAnimatorSpeed;
         }
 
 
@@ -71,8 +76,13 @@ namespace Weapon
             }
         }
 
-        private void SetIdleAnimation() => 
-            animator.SetBool(IsIdle, _input.GetMove() == Vector2.zero);
+        private void SetReloadingAnimation(float reloadingTime)
+        {
+            animator.speed = 1 / reloadingTime;
+            animator.SetTrigger(IsReloading);
+        }
+
+        private void SetIdleAnimation() => animator.SetBool(IsIdle, _input.GetMove() == Vector2.zero);
 
         private void SetSprintingAnimation() => 
             animator.SetBool(IsSprinting, _player.IsSprinting);
@@ -88,12 +98,14 @@ namespace Weapon
             _isFalling = true;
             animator.SetTrigger(IsFalling);
         }
-    
+
         private void SetLandingAnimation()
         {
             _isFalling = false;
             animator.SetTrigger(IsLanding);
         }
 
+        private void ResetAnimatorSpeed() => 
+            animator.speed = 1;
     }
 }
