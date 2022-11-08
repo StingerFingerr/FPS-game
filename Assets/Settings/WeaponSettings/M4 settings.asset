@@ -12,17 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0a56c963c2ece14e92b574e36cde4e9, type: 3}
   m_Name: M4 settings
   m_EditorClassIdentifier: 
-  name: M4
-  aimingTime: 10
-  swayIntensityX: 0.5
-  swayIntensityY: 0.5
-  aimingSwayIntensityModifier: 0.25
-  swayInvertedX: 1
-  swayInvertedY: 0
-  swayClampX: 0.15
-  swayClampY: 0.15
-  swaySmooth: 10
-  movementSwayIntensity: 40
-  movementSwayClampX: 20
-  movementSwayClampY: 20
-  movementSwaySmooth: 1
+  weaponName: 
+  aimingSpeed: 10
+  reloadingTime: 1.5
