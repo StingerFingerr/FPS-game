@@ -6,7 +6,8 @@ namespace Weapon
     public class WeaponSettings : ScriptableObject
     {
         public string weaponName;
-        public float aimingTime = 10;
-    
+        public float aimingSpeed = 10;
+
+        public float reloadingTime = 3f;
     }
 }

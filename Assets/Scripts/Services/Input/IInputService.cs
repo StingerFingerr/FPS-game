@@ -9,7 +9,7 @@ namespace Services.Input
         event Action StartFiring;
         event Action FinishFiring;
         event Action SwitchFiringMode;
-
+        event Action Reloading;
         event Action StartAiming;
         event Action FinishAiming;
 

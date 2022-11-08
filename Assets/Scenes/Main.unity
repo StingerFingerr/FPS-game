@@ -1152,7 +1152,6 @@ MonoBehaviour:
   - {fileID: 521716808}
   - {fileID: 521716809}
   - {fileID: 521716810}
-  firingModeIndex: 0
 --- !u!114 &521716806
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1165,6 +1164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bab080932b3a4460a308da1d5a40a3bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weapon: {fileID: 521716805}
   settings: {fileID: 11400000, guid: 5aa1b6c4441a3e3408fa07178447cbab, type: 2}
 --- !u!114 &521716807
 MonoBehaviour:
@@ -1520,6 +1520,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d3236223f644eeaa567856ddecf4ed1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weapon: {fileID: 521716805}
   animator: {fileID: 684211221}
 --- !u!1 &762261520
 GameObject:
