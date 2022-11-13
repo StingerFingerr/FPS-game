@@ -2,6 +2,7 @@ using System;
 using Services.Input;
 using Unity.Mathematics;
 using UnityEngine;
+using Weapon;
 using Zenject;
 
 namespace Character
@@ -14,7 +15,8 @@ namespace Character
         public PlayerSettings playerSettings;
         public float terminalVerticalVelocity = 10;
         public CharacterController characterController;
-
+        public WeaponHolder weaponHolder;
+        
         public event Action PlayerJump;
         public event Action PlayerFalling;
         public event Action PlayerLands;
@@ -22,7 +24,6 @@ namespace Character
         public bool IsGrounded { get; private set; }
 
         private IInputService _input;
-
 
         private float _verticalVelocity;
 
@@ -52,10 +53,9 @@ namespace Character
             _input.Crouch += ToggleCrouch;
             _input.Prone += ToggleProne;
 
-            //_input.StartAiming += () => IsAiming = true;
-            //_input.FinishAiming += () => IsAiming = false;
-
-            currentWeapon.OnShot += SetRecoil;
+            if (currentWeapon)
+                currentWeapon.OnShot += SetRecoil;
+            weaponHolder.OnWeaponSwitched += SetNewWeapon;
         }
 
         private void FixedUpdate()
@@ -82,7 +82,7 @@ namespace Character
             float sensX = playerSettings.mouseSensitivityX;
             float sensY = playerSettings.mouseSensitivityY;
 
-            if (currentWeapon.IsAiming)
+            if (currentWeapon?.IsAiming ?? false)
             {
                 sensX *= playerSettings.aimingMouseSensitivityModifier;
                 sensY *= playerSettings.aimingMouseSensitivityModifier;
@@ -93,7 +93,7 @@ namespace Character
             _verticalRotation += look.y * sensY * Time.deltaTime *
                                  (playerSettings.mouseInvertedY ? 1 : -1);
 
-            float recoilSmooth = currentWeapon ? currentWeapon.recoil.recoilSmooth : 1;
+            float recoilSmooth = currentWeapon is not null ? currentWeapon.recoil.recoilSmooth : 1;
             _recoil = Vector2.Lerp(_recoil, Vector2.zero, Time.deltaTime * recoilSmooth);
 
             _horizontalRotation += _recoil.x;
@@ -141,9 +141,10 @@ namespace Character
         private void CheckSprinting(Vector2 move)
         {
             if (move.y < 0 ||
-                IsProneStance||
-                currentWeapon.IsAiming||
-                currentWeapon.IsReloading)
+                IsProneStance)
+                IsSprinting = false;
+            if (currentWeapon?.IsAiming ??
+                currentWeapon?.IsReloading ?? false)
                 IsSprinting = false;
         }
 
@@ -176,7 +177,7 @@ namespace Character
                     targetVelocity *= playerSettings.proneSpeedModifier;
             }
 
-            if (currentWeapon.IsAiming)
+            if (currentWeapon?.IsAiming ?? false)
             {
                 if (IsProneStance)
                     targetVelocity = 0;
@@ -291,5 +292,15 @@ namespace Character
 
         private void SetRecoil() => 
             _recoil = currentWeapon.recoil.GetRecoilAmount();
+
+        private void SetNewWeapon(Weapon.Weapon weapon)
+        {
+            if(currentWeapon)
+                currentWeapon.OnShot -= SetRecoil;
+            
+            currentWeapon = weapon;
+            
+            currentWeapon.OnShot += SetRecoil;
+        }
     }
 }
