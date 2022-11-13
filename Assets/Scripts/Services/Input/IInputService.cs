@@ -22,6 +22,7 @@ namespace Services.Input
         event Action Prone;
 
         event Action Interact;
+        event Action ThrowAway;
 
         Vector2 GetMove();
         Vector2 GetLook();

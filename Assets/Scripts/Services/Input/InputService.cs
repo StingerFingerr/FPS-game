@@ -17,6 +17,7 @@ namespace Services.Input
         public event Action Crouch;
         public event Action Prone;
         public event Action Interact;
+        public event Action ThrowAway;
 
         private InputActions _inputActions;
 
@@ -43,6 +44,7 @@ namespace Services.Input
             _inputActions.Weapon.Reloading.performed += e => Reloading?.Invoke();
 
             _inputActions.Weapon.Interact.performed += e => Interact?.Invoke();
+            _inputActions.Weapon.ThrowAway.performed += e => ThrowAway?.Invoke();
             
             _inputActions.Enable();
         }

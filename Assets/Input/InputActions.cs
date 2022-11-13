@@ -254,6 +254,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ThrowAway"",
+                    ""type"": ""Button"",
+                    ""id"": ""caac86d2-1f7b-4d6d-b44b-918b1967f5e0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -322,6 +331,17 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""51149f15-9493-4948-845d-0c527e1c9a13"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ThrowAway"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -343,6 +363,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_Weapon_SwitchFiringMode = m_Weapon.FindAction("SwitchFiringMode", throwIfNotFound: true);
         m_Weapon_Reloading = m_Weapon.FindAction("Reloading", throwIfNotFound: true);
         m_Weapon_Interact = m_Weapon.FindAction("Interact", throwIfNotFound: true);
+        m_Weapon_ThrowAway = m_Weapon.FindAction("ThrowAway", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -480,6 +501,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Weapon_SwitchFiringMode;
     private readonly InputAction m_Weapon_Reloading;
     private readonly InputAction m_Weapon_Interact;
+    private readonly InputAction m_Weapon_ThrowAway;
     public struct WeaponActions
     {
         private @InputActions m_Wrapper;
@@ -489,6 +511,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         public InputAction @SwitchFiringMode => m_Wrapper.m_Weapon_SwitchFiringMode;
         public InputAction @Reloading => m_Wrapper.m_Weapon_Reloading;
         public InputAction @Interact => m_Wrapper.m_Weapon_Interact;
+        public InputAction @ThrowAway => m_Wrapper.m_Weapon_ThrowAway;
         public InputActionMap Get() { return m_Wrapper.m_Weapon; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -513,6 +536,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Interact.started -= m_Wrapper.m_WeaponActionsCallbackInterface.OnInteract;
                 @Interact.performed -= m_Wrapper.m_WeaponActionsCallbackInterface.OnInteract;
                 @Interact.canceled -= m_Wrapper.m_WeaponActionsCallbackInterface.OnInteract;
+                @ThrowAway.started -= m_Wrapper.m_WeaponActionsCallbackInterface.OnThrowAway;
+                @ThrowAway.performed -= m_Wrapper.m_WeaponActionsCallbackInterface.OnThrowAway;
+                @ThrowAway.canceled -= m_Wrapper.m_WeaponActionsCallbackInterface.OnThrowAway;
             }
             m_Wrapper.m_WeaponActionsCallbackInterface = instance;
             if (instance != null)
@@ -532,6 +558,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Interact.started += instance.OnInteract;
                 @Interact.performed += instance.OnInteract;
                 @Interact.canceled += instance.OnInteract;
+                @ThrowAway.started += instance.OnThrowAway;
+                @ThrowAway.performed += instance.OnThrowAway;
+                @ThrowAway.canceled += instance.OnThrowAway;
             }
         }
     }
@@ -552,5 +581,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         void OnSwitchFiringMode(InputAction.CallbackContext context);
         void OnReloading(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
+        void OnThrowAway(InputAction.CallbackContext context);
     }
 }

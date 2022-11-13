@@ -29,7 +29,8 @@ namespace Weapon
             _player = player;
             _input = input;
 
-            Subscribe();
+            weapon.OnWeaponPickedUp += Subscribe;
+            weapon.OnWeaponThrown += Unsubscribe;
         }
 
         private void Subscribe()

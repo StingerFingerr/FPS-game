@@ -56,6 +56,8 @@ namespace Character
             
             if (_interactable is Weapon.Weapon)            
                 PickUpWeapon((Weapon.Weapon) _interactable);
+
+            _interactable = null;
         }
 
         private void PickUpWeapon(Weapon.Weapon weapon)
