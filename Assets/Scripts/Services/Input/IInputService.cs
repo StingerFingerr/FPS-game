@@ -21,6 +21,8 @@ namespace Services.Input
         event Action Crouch;
         event Action Prone;
 
+        event Action Interact;
+
         Vector2 GetMove();
         Vector2 GetLook();
     }

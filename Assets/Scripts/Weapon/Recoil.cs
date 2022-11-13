@@ -1,4 +1,5 @@
-﻿using Character;
+﻿using System;
+using Character;
 using Services.Input;
 using Unity.Mathematics;
 using UnityEngine;
@@ -17,19 +18,13 @@ namespace Weapon
         public Vector3 recoilRotationOffset;
         public float aimingRecoilAmountModifier;
         public Weapon weapon;
-
-        private IInputService _input;
         
         private Vector3 _recoilPosOffset;
         private Vector3 _recoilRotOffset;
 
-        [Inject]
-        private void Construct(IInputService input)
-        {
-            _input = input;
-            
+
+        private void OnEnable() => 
             Subscribe();
-        }
 
         private void Subscribe()
         {

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 724e07605592bea49b7bbef3c961473d, type: 3}
   m_Name: PlayerSettings
   m_EditorClassIdentifier: 
-  mouseSensitivityX: 10
-  mouseSensitivityY: 10
+  mouseSensitivityX: 5
+  mouseSensitivityY: 5
   aimingMouseSensitivityModifier: 0.5
   bottomClamp: -80
   topClamp: 80

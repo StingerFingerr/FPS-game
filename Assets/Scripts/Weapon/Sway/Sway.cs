@@ -15,20 +15,31 @@ namespace Weapon
 
         private Quaternion _originRotation;
         private Quaternion _targetRotation;
+        private bool _isCanSway;
 
         [Inject]
         private void Construct(IInputService input)
         {
             _input = input;
+            Subscribe();
+        }
+
+        private void Subscribe()
+        {
+            weapon.OnWeaponPickedUp += () => _isCanSway = true;
+            weapon.OnWeaponThrown += () =>  _isCanSway = false;
         }
 
         private void Start()
         {
-            _originRotation = transform.localRotation;
+            _originRotation = Quaternion.Euler(Vector3.zero);
         }
 
         private void FixedUpdate()
         {
+            if(_isCanSway is false)
+                return;
+            
             SetSway();
             CalculateSway();
             CalculateMovementSway();

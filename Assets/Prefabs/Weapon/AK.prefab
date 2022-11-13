@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4190151344800978426}
   - component: {fileID: 4190151344800978427}
   - component: {fileID: 4190151344800978424}
+  - component: {fileID: 2826408999625719104}
   m_Layer: 7
   m_Name: AK
   m_TagString: Untagged
@@ -51,13 +52,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: 0d557c7b85fd37f41b28b28b442f6323, type: 2}
-  hipPosition: {x: 0.2, y: -0.2, z: 0.3}
-  aimPosition: {x: 0, y: -0.164, z: 0.2}
+  hipPosition: {x: 0.2, y: -0.1, z: 0.3}
+  aimPosition: {x: 0, y: -0.045, z: 0.2}
   recoil: {fileID: 4190151344800978421}
   firingModes:
   - {fileID: 4190151344800978426}
   - {fileID: 4190151344800978427}
   - {fileID: 4190151344800978424}
+  type: 1
 --- !u!114 &4190151344800978421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,6 +134,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firingRate: 0.1
+--- !u!65 &2826408999625719104
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4190151344800978417}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.04978527, y: 0.24723263, z: 0.7852762}
+  m_Center: {x: 0.0012340471, y: -0.075276785, z: 0.060468197}
 --- !u!1 &4190151345005407649
 GameObject:
   m_ObjectHideFlags: 0
@@ -174,7 +189,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4190151345005407649}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 5916cfb8d88c6eb4098494004e46f021, type: 2}
   m_CullingMode: 0

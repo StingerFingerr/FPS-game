@@ -1,4 +1,5 @@
-﻿using Character;
+﻿using System;
+using Character;
 using Services.Input;
 using UnityEngine;
 using Zenject;
@@ -42,8 +43,26 @@ namespace Weapon
             
             weapon.OnStartReloading += SetReloadingAnimation;
             weapon.OnFinishReloading += ResetAnimatorSpeed;
+
+            weapon.OnWeaponPickedUp += EnableAnimator;
+            weapon.OnWeaponThrown += DisableAnimator;
         }
 
+        private void Unsubscribe()
+        {
+            _player.PlayerJump -= SetJumpingAnimation;
+            _player.PlayerLands -= SetLandingAnimation;
+            _player.PlayerFalling -= SetFallingAnimation;
+            
+            weapon.OnStartAiming -= StartAiming;
+            weapon.OnFinishAiming -= FinishAiming;
+            
+            weapon.OnStartReloading -= SetReloadingAnimation;
+            weapon.OnFinishReloading -= ResetAnimatorSpeed;
+
+            weapon.OnWeaponPickedUp -= EnableAnimator;
+            weapon.OnWeaponThrown -= DisableAnimator;
+        }
 
         private void Update()
         {
@@ -55,14 +74,13 @@ namespace Weapon
         private void StartAiming()
         {
             _isAiming = true;
-            animator.enabled = false;
+            DisableAnimator();
         }
 
         private void FinishAiming()
         {
             _isAiming = false;
-            animator.enabled = true;
-            
+            EnableAnimator();
             animator.Rebind();
         }
 
@@ -107,5 +125,11 @@ namespace Weapon
 
         private void ResetAnimatorSpeed() => 
             animator.speed = 1;
+
+        private void EnableAnimator() => 
+            animator.enabled = true;
+
+        private void DisableAnimator() => 
+            animator.enabled = false;
     }
 }

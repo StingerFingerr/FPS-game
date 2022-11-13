@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using Character;
 using Services.Input;
 using UnityEngine;
 using Weapon.Firing_Modes;
@@ -8,36 +7,50 @@ using Zenject;
 
 namespace Weapon
 {
-    public class Weapon : MonoBehaviour
+    public class Weapon : MonoBehaviour, IInteractable
     {
         public WeaponSettings settings;
         public Vector3 hipPosition;
         public Vector3 aimPosition;
         public Recoil recoil;
         public BaseFiringMode[] firingModes;
-
+        public WeaponType type;
         public event Action OnShot;
         public event Action OnStartAiming;
         public event Action OnFinishAiming;
         public event Action<float> OnStartReloading;
         public event Action OnFinishReloading;
+        public event Action OnWeaponPickedUp;
+        public event Action OnWeaponThrown;
         
         public bool IsAiming { get; private set; }
         public bool IsReloading { get; private set; }
 
-        private CharacterControllerScript _player;
         private IInputService _input;
 
         private int _firingModeIndex = 0;
         private bool _isFiring;
-        
-        [Inject]
-        private void Construct(CharacterControllerScript player, IInputService input)
-        {
-            _player = player;
-            _input = input;
+        private bool _isPicked;
 
+        [Inject]
+        private void Construct(IInputService input)
+        {
+            _input = input;
+        }
+
+        public void Interact()
+        {
             Subscribe();
+            _isPicked = true;
+            OnWeaponPickedUp?.Invoke();
+        }
+
+        public void ThrowAway()
+        {
+            UnSubscribe();
+            _isPicked = false;
+            transform.parent = null;
+            OnWeaponThrown?.Invoke();
         }
 
         private void Subscribe()
@@ -52,8 +65,20 @@ namespace Weapon
             _input.FinishAiming += FinishAiming;
         }
 
+        private void UnSubscribe()
+        {
+            _input.SwitchFiringMode -= SwitchFiringMode;
+            _input.Reloading -= Reload;
+            
+            _input.StartAiming -= StartAiming;
+            _input.FinishAiming -= FinishAiming;
+        }
+
         private void Update()
         {
+            if(_isPicked is false)
+                return;
+            
             if(_isFiring)
                 Fire();
             

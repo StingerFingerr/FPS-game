@@ -16,6 +16,7 @@ namespace Services.Input
         public event Action Jump;
         public event Action Crouch;
         public event Action Prone;
+        public event Action Interact;
 
         private InputActions _inputActions;
 
@@ -41,6 +42,8 @@ namespace Services.Input
             _inputActions.Weapon.SwitchFiringMode.performed += e => SwitchFiringMode?.Invoke();
             _inputActions.Weapon.Reloading.performed += e => Reloading?.Invoke();
 
+            _inputActions.Weapon.Interact.performed += e => Interact?.Invoke();
+            
             _inputActions.Enable();
         }
 
