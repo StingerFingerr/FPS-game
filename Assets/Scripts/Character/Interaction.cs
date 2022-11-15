@@ -54,8 +54,8 @@ namespace Character
         {
             _interactable?.Interact();
             
-            if (_interactable is Weapon.Weapon)            
-                PickUpWeapon((Weapon.Weapon) _interactable);
+            if (_interactable is Weapon.Weapon weapon)            
+                PickUpWeapon(weapon);
 
             _interactable = null;
         }

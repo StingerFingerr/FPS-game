@@ -18,6 +18,7 @@ namespace Services.Input
         public event Action Prone;
         public event Action Interact;
         public event Action ThrowAway;
+        public event Action<float> MouseScroll;
 
         private InputActions _inputActions;
 
@@ -45,6 +46,8 @@ namespace Services.Input
 
             _inputActions.Weapon.Interact.performed += e => Interact?.Invoke();
             _inputActions.Weapon.ThrowAway.performed += e => ThrowAway?.Invoke();
+
+            _inputActions.Weapon.ScrollForward.performed += e => MouseScroll?.Invoke(e.ReadValue<float>());
             
             _inputActions.Enable();
         }

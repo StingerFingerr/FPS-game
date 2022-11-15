@@ -12,7 +12,7 @@ namespace Weapon
         private IInputService _input;
         
         private Weapon[] _weaponsSlots = new Weapon[3];
-        private int _weaponIndex = 1;
+        private int _weaponIndex = 0;
 
         [Inject]
         private void Construct(IInputService input)
@@ -21,27 +21,42 @@ namespace Weapon
             Subscribe();
         }
 
-        private void Subscribe() => 
+        private void Subscribe()
+        {
             _input.ThrowAway += ThrowAwayWeapon;
+            _input.MouseScroll += SwitchWeapon;
+        }
 
         public void SetNewWeapon(Weapon weapon)
         {
             switch (weapon.type)
             {
                 case WeaponType.Pistol:
+                    SwitchActiveSlot(0);
                     SetWeaponInSlot(ref _weaponsSlots[0], weapon);
                     break;
                 case WeaponType.MachineGun: 
+                    SwitchActiveSlot(1);
                     SetWeaponInSlot(ref _weaponsSlots[1], weapon);
                     break;
                 case WeaponType.SniperRifle: 
+                    SwitchActiveSlot(2);
                     SetWeaponInSlot(ref _weaponsSlots[2], weapon);
                     break;
             }
         }
 
+        private void SwitchActiveSlot(int target)
+        {
+            if (target == _weaponIndex)
+                return;
+            
+            _weaponsSlots[_weaponIndex]?.Hide();
+            _weaponIndex = target;
+        }
         private void SetWeaponInSlot(ref Weapon slot, Weapon weapon)
         {
+            slot?.Take();
             slot?.ThrowAway();
             slot = weapon;
 
@@ -55,6 +70,23 @@ namespace Weapon
             _weaponsSlots[_weaponIndex]?.ThrowAway();
             _weaponsSlots[_weaponIndex] = null;
 
+        }
+
+        private void SwitchWeapon(float scroll)
+        {
+            _weaponsSlots[_weaponIndex]?.Hide();
+            if (scroll > 0)
+            {
+                _weaponIndex++;
+                if (_weaponIndex > _weaponsSlots.Length - 1)                
+                    _weaponIndex = 0;
+            }else if (scroll < 0)
+            {
+                _weaponIndex--;
+                if (_weaponIndex < 0)
+                    _weaponIndex = _weaponsSlots.Length - 1;
+            }
+            _weaponsSlots[_weaponIndex]?.Take();
         }
     }
 }

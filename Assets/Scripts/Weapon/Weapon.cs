@@ -152,5 +152,15 @@ namespace Weapon
             else
                 transform.localPosition = Vector3.Lerp(transform.localPosition, hipPosition, Time.deltaTime * settings.aimingSpeed);
         }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public void Take()
+        {
+            gameObject.SetActive(true);
+        }
     }
 }

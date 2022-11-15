@@ -24,6 +24,8 @@ namespace Services.Input
         event Action Interact;
         event Action ThrowAway;
 
+        event Action<float> MouseScroll;
+
         Vector2 GetMove();
         Vector2 GetLook();
     }

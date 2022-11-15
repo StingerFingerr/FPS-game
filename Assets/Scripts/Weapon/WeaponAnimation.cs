@@ -45,8 +45,7 @@ namespace Weapon
             weapon.OnStartReloading += SetReloadingAnimation;
             weapon.OnFinishReloading += ResetAnimatorSpeed;
 
-            weapon.OnWeaponPickedUp += EnableAnimator;
-            weapon.OnWeaponThrown += DisableAnimator;
+            EnableAnimator();
         }
 
         private void Unsubscribe()
@@ -61,8 +60,7 @@ namespace Weapon
             weapon.OnStartReloading -= SetReloadingAnimation;
             weapon.OnFinishReloading -= ResetAnimatorSpeed;
 
-            weapon.OnWeaponPickedUp -= EnableAnimator;
-            weapon.OnWeaponThrown -= DisableAnimator;
+            DisableAnimator();
         }
 
         private void Update()

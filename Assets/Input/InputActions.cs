@@ -263,6 +263,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ScrollForward"",
+                    ""type"": ""Value"",
+                    ""id"": ""2ab924e5-f515-4ced-888d-e9496c909cae"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -342,6 +351,17 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""action"": ""ThrowAway"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b8f50748-32ec-4a07-9c66-e86ed7d76716"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ScrollForward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -364,6 +384,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_Weapon_Reloading = m_Weapon.FindAction("Reloading", throwIfNotFound: true);
         m_Weapon_Interact = m_Weapon.FindAction("Interact", throwIfNotFound: true);
         m_Weapon_ThrowAway = m_Weapon.FindAction("ThrowAway", throwIfNotFound: true);
+        m_Weapon_ScrollForward = m_Weapon.FindAction("ScrollForward", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -502,6 +523,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Weapon_Reloading;
     private readonly InputAction m_Weapon_Interact;
     private readonly InputAction m_Weapon_ThrowAway;
+    private readonly InputAction m_Weapon_ScrollForward;
     public struct WeaponActions
     {
         private @InputActions m_Wrapper;
@@ -512,6 +534,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         public InputAction @Reloading => m_Wrapper.m_Weapon_Reloading;
         public InputAction @Interact => m_Wrapper.m_Weapon_Interact;
         public InputAction @ThrowAway => m_Wrapper.m_Weapon_ThrowAway;
+        public InputAction @ScrollForward => m_Wrapper.m_Weapon_ScrollForward;
         public InputActionMap Get() { return m_Wrapper.m_Weapon; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -539,6 +562,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @ThrowAway.started -= m_Wrapper.m_WeaponActionsCallbackInterface.OnThrowAway;
                 @ThrowAway.performed -= m_Wrapper.m_WeaponActionsCallbackInterface.OnThrowAway;
                 @ThrowAway.canceled -= m_Wrapper.m_WeaponActionsCallbackInterface.OnThrowAway;
+                @ScrollForward.started -= m_Wrapper.m_WeaponActionsCallbackInterface.OnScrollForward;
+                @ScrollForward.performed -= m_Wrapper.m_WeaponActionsCallbackInterface.OnScrollForward;
+                @ScrollForward.canceled -= m_Wrapper.m_WeaponActionsCallbackInterface.OnScrollForward;
             }
             m_Wrapper.m_WeaponActionsCallbackInterface = instance;
             if (instance != null)
@@ -561,6 +587,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @ThrowAway.started += instance.OnThrowAway;
                 @ThrowAway.performed += instance.OnThrowAway;
                 @ThrowAway.canceled += instance.OnThrowAway;
+                @ScrollForward.started += instance.OnScrollForward;
+                @ScrollForward.performed += instance.OnScrollForward;
+                @ScrollForward.canceled += instance.OnScrollForward;
             }
         }
     }
@@ -582,5 +611,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         void OnReloading(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnThrowAway(InputAction.CallbackContext context);
+        void OnScrollForward(InputAction.CallbackContext context);
     }
 }
