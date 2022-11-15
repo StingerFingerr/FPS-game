@@ -29,7 +29,8 @@ namespace Weapon
             _player = player;
             _input = input;
 
-            Subscribe();
+            weapon.OnWeaponPickedUp += Subscribe;
+            weapon.OnWeaponThrown += Unsubscribe;
         }
 
         private void Subscribe()
@@ -44,8 +45,7 @@ namespace Weapon
             weapon.OnStartReloading += SetReloadingAnimation;
             weapon.OnFinishReloading += ResetAnimatorSpeed;
 
-            weapon.OnWeaponPickedUp += EnableAnimator;
-            weapon.OnWeaponThrown += DisableAnimator;
+            EnableAnimator();
         }
 
         private void Unsubscribe()
@@ -60,8 +60,7 @@ namespace Weapon
             weapon.OnStartReloading -= SetReloadingAnimation;
             weapon.OnFinishReloading -= ResetAnimatorSpeed;
 
-            weapon.OnWeaponPickedUp -= EnableAnimator;
-            weapon.OnWeaponThrown -= DisableAnimator;
+            DisableAnimator();
         }
 
         private void Update()

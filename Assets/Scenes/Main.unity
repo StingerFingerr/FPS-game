@@ -1007,7 +1007,7 @@ GameObject:
   - component: {fileID: 510872170}
   - component: {fileID: 510872169}
   - component: {fileID: 510872168}
-  - component: {fileID: 510872167}
+  - component: {fileID: 510872171}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -1015,20 +1015,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!64 &510872167
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 510872166}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &510872168
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1094,6 +1080,19 @@ Transform:
   m_Father: {fileID: 526290403}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &510872171
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510872166}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 10, y: 3, z: 10}
+  m_Center: {x: 0, y: -1.5, z: 0}
 --- !u!1 &526290402
 GameObject:
   m_ObjectHideFlags: 0
@@ -1516,7 +1515,7 @@ MonoBehaviour:
   interactableMask:
     serializedVersion: 2
     m_Bits: 128
-  interactableDistance: 2
+  interactableDistance: 3
   fpsCameraTransform: {fileID: 390431100}
   weaponHolder: {fileID: 1096820929}
 --- !u!1001 &1007052492
@@ -1526,6 +1525,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2082554273522088052, guid: d03bccc217e07b64489cf70954d3dba0,
+        type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2082554273522088052, guid: d03bccc217e07b64489cf70954d3dba0,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4190151344800978417, guid: d03bccc217e07b64489cf70954d3dba0,
         type: 3}
       propertyPath: m_Name
@@ -1632,9 +1641,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e07fc3e21104e3985a84794237b1788, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pistolSlot: {fileID: 0}
-  machineGunSlot: {fileID: 0}
-  sniperRifleSlot: {fileID: 0}
 --- !u!1 &1198837612
 GameObject:
   m_ObjectHideFlags: 0
@@ -2309,6 +2315,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2082554273522088052, guid: 5546d8fbbe1d9eb41aeeb3f8fe83ff94,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4190151344800978417, guid: 5546d8fbbe1d9eb41aeeb3f8fe83ff94,
         type: 3}
       propertyPath: m_Name
@@ -2368,6 +2379,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4190151344800978423, guid: 5546d8fbbe1d9eb41aeeb3f8fe83ff94,
+        type: 3}
+      propertyPath: type
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5546d8fbbe1d9eb41aeeb3f8fe83ff94, type: 3}

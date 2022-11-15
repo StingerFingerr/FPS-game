@@ -4,9 +4,11 @@ using Services.Input;
 using UnityEngine;
 using Weapon.Firing_Modes;
 using Zenject;
+using Random = UnityEngine.Random;
 
 namespace Weapon
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class Weapon : MonoBehaviour, IInteractable
     {
         public WeaponSettings settings;
@@ -15,6 +17,8 @@ namespace Weapon
         public Recoil recoil;
         public BaseFiringMode[] firingModes;
         public WeaponType type;
+        public Rigidbody rb;
+        public new BoxCollider collider;
         public event Action OnShot;
         public event Action OnStartAiming;
         public event Action OnFinishAiming;
@@ -42,6 +46,8 @@ namespace Weapon
         {
             Subscribe();
             _isPicked = true;
+            collider.enabled = false;
+            rb.isKinematic = true;
             OnWeaponPickedUp?.Invoke();
         }
 
@@ -49,7 +55,14 @@ namespace Weapon
         {
             UnSubscribe();
             _isPicked = false;
+            IsAiming = false;
             transform.parent = null;
+
+            collider.enabled = true;
+            rb.isKinematic = false;
+            rb.AddForce(transform.forward * 3, ForceMode.Impulse);
+            rb.AddTorque(transform.forward * Random.Range(-2, 2));
+
             OnWeaponThrown?.Invoke();
         }
 
@@ -138,6 +151,16 @@ namespace Weapon
                 transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition, Time.deltaTime * settings.aimingSpeed);
             else
                 transform.localPosition = Vector3.Lerp(transform.localPosition, hipPosition, Time.deltaTime * settings.aimingSpeed);
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public void Take()
+        {
+            gameObject.SetActive(true);
         }
     }
 }

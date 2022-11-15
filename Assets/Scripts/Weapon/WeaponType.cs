@@ -2,8 +2,8 @@
 {
     public enum WeaponType
     {
-        Pistol,
-        MachineGun,
-        SniperRifle,
+        Pistol = 0,
+        MachineGun = 1,
+        SniperRifle = 2,
     }
 }
